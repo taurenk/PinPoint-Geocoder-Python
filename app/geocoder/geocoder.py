@@ -2,8 +2,8 @@ __author__ = 'Tauren'
 
 import traceback
 
-from address import Address
-from parser import AddressParser
+from .address import Address
+from .parser import AddressParser
 
 
 class Geocoder:
@@ -15,8 +15,8 @@ class Geocoder:
         try:
             address = AddressParser().parse_address_string(Address(address_string))
         except Exception as error:
-            print 'Error occured while geocoding: %s' % error
-            print 'Traceback: %s' % traceback.format_exc()
+            print('Error occured while geocoding: %s' % error)
+            print('Traceback: %s' % traceback.format_exc())
 
     def geocode_address(self):
         pass

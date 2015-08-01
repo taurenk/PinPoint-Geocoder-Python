@@ -1,7 +1,8 @@
 __author__ = 'Tauren'
 
-from app.geocoder.utils import Regex
-from app.geocoder.utils import Standards
+from app.geocoder.utils.regex import Regex
+from app.geocoder.utils.standards import Standards
+
 
 class AddressParser:
 
@@ -18,7 +19,8 @@ class AddressParser:
             address_string = address_string.replace(address.zip, '').strip()
 
         state = self.regex.state_regex.search(address_string)
-        print state
+        print(state)
+
         if state:
             address.state = state.group(0).strip().upper()
             address_string = address_string[0:state.span()[0]]

@@ -942,7 +942,6 @@ class Standards:
             'WY' : 'WAY',
             'XING' : 'XING'
     }
-    canonical_types = dict(tiger_street_types.items() + usps_street_types.items())
 
     states = {
             'ALABAMA' : 'AL',

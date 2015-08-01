@@ -2,8 +2,7 @@ __author__ = 'Tauren'
 
 import unittest
 
-from parser import AddressParser
-
+from app.geocoder.parser import AddressParser
 from app.geocoder.address import Address
 
 class TestParser(unittest.TestCase):

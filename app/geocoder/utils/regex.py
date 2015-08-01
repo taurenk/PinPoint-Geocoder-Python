@@ -8,7 +8,7 @@ from app.geocoder.utils.standards import Standards
 class Regex:
 
     def __init__(self):
-        print 'Initiating RegexLib'
+        print('Initiating RegexLib')
 
         # Standard Regex from trial and error
         self.number_regex = re.compile(r'^\d+[-]?(\w+)?')

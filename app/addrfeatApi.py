@@ -2,7 +2,7 @@ __author__ = 'Tauren'
 
 from flask import abort
 from flask.ext.restful import Resource, marshal, fields
-from models import AddrFeat
+from .models import AddrFeat
 from app import db
 
 
