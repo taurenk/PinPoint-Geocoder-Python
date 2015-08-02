@@ -36,17 +36,53 @@ class Geocoder:
             print('Error occured while geocoding: %s' % error)
             print('Traceback: %s' % traceback.format_exc())
 
-    def geocode_address(self):
+    def geocode_address(self, address):
         """ Try to further parse address in pieces.
         :return:
         """
+        potential_places = []
+        if address.zip:
+            potential_places.append(self.places_by_zip(address.zip))
+        # we will *never* have city at this point in the algorithm.
+
+        if not potential_places:
+            tokens = address.address_line_1.split(' ')[-3:]
+            guess_tokens = []
+            # make all combinations of tokens
+            for idx, token in enumerate(tokens):
+                guess_tokens.append(token)
+                if idx > 0:
+                    guess_tokens[0] += token
+                if idx > 1:
+                    guess_tokens[1] += token
+            potential_places.append(self.places_by_city_list(guess_tokens))
+
+        # Try and extract potential places from city from address string
+        potential_places = [p.city for p in potential_places]
+        self.extract_city(address.address_line_1, potential_places)
+
+        # We can find a city without a city, state and zip....
+
+    def extract_city(self, address, place_list):
+        # Sort by longest string
+        # match up against street_string
+        # Return Place that fits OR None if none fit.
+
+        # MODIFY ALGO TO MATCH LAST LENGTHS...
+        place_list.sort(key=len)
+        place_list.reverse()
+
+        for place in place_list:
+            if place in address.address_line_1:
+                address.address_line_1 = address.address_line_1.replace(place, '')
+                break
 
     def geocode_zipcode(self):
         pass
 
     def places_by_zip(self, zipcode):
-        # TODO; zipcodes should be 1 for 1; CONFIRM and DOCUMENT HERE.
-        results = db.session.query(Place).filter(Place.zip == zipcode).all()
+        # Zipcodes should match 1 for 1 (uniquly), so return only one result.
+        results = db.session.query(Place).filter(Place.zip == zipcode).one()
         return results
 
     def places_by_city(self, city):
@@ -54,4 +90,11 @@ class Geocoder:
         :param city:
         :return:
         """
-        pass
+        # Let's change this to get 'fuzzy results'
+        results = db.session.query(Place).filter(Place.city == city).all()
+        return results
+
+    def places_by_city_list(self, city_list):
+        results = db.session.query(Place).filter(Place.city.in_(city_list)).all()
+        return results
+
