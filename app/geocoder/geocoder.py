@@ -2,14 +2,15 @@ __author__ = 'Tauren'
 
 import traceback
 
+from app import db
 from .address import Address
 from .parser import AddressParser
 from app.models import Place, AddrFeat
 
 class Geocoder:
 
-    def __init__(self, postgresql_connection):
-        self.db = postgresql_connection
+    def __init__(self):
+        pass
 
     def geocode(self, address_string):
         try:
@@ -45,7 +46,7 @@ class Geocoder:
 
     def places_by_zip(self, zipcode):
         # TODO; zipcodes should be 1 for 1; CONFIRM and DOCUMENT HERE.
-        results = self.db.session.query(Place).filter(Place.zip == zipcode).all()
+        results = db.session.query(Place).filter(Place.zip == zipcode).all()
         return results
 
     def places_by_city(self, city):

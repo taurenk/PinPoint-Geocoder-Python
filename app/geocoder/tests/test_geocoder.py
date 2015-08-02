@@ -1,23 +1,25 @@
 __author__ = 'Tauren'
 
-import unittest
-from sqlalchemy import create_engine
-from sqlalchemy.orm.session import sessionmaker
 
-from config import SQLALCHEMY_DATABASE_URI
+from flask.ext.testing import TestCase
+from flask import Flask
+from app import create_app, db
+
 from app.geocoder.geocoder import Geocoder
 
-class TestGeocoder(unittest.TestCase):
+class TestGeocoder(TestCase):
 
-    def setUp(self):
-        engine = create_engine(SQLALCHEMY_DATABASE_URI)
-        # self.connection = Session.configure(bind=engine)
-        session = sessionmaker(bind=engine)
-        self.geocoder =  Geocoder(session)
+    def create_app(self):
+        """ Set up an app object with testing config """
+        app = Flask(__name__)
+        app.config.from_object('config')
+        db.init_app(app)
+        app.db = db
+        return app
 
     def test_places_by_zip_pass(self):
-        results = self.geocoder.places_by_zip('11949')
-        print('Places By Zip: %s' % results)
+        results = Geocoder().places_by_zip('11949')
+        assert results[0].city == 'MANORVILLE'
 
 if __name__ == '__main__':
-    unittest.main()
+    TestGeocoder()
