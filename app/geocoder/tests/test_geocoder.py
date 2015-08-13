@@ -36,7 +36,15 @@ class TestGeocoder(TestCase):
     def test_extract_city(self):
         address = Address('testing')
         address.address_line_1 = 'MCGUIRK STREET EAST HAMPTON'
-        pass
+
+    def test_guess_city(self):
+        address_string ='6 CAPUTO DRIVE EAST MORICHES'
+        tokens = self.geocoder.guess_city(address_string)
+        assert len(tokens) == 6
+
+    def test_all(self):
+        address = '1 MCGUIRK STREET EAST HAMPTON NY 11934'
+        self.geocoder.geocode(address)
 
 if __name__ == '__main__':
     TestGeocoder()

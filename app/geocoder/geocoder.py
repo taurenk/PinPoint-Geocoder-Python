@@ -22,11 +22,9 @@ class Geocoder:
                 Case; City/State/Zip
                     - Here we want to figure out what we can and return it!
             """
-            # This is just for testing..
-            if ' and ' in address.address_line_1:
-                return {'Error': 'Intersections not yet supported.'}
-            elif address.address_line_1:
-                pass
+            if address.address_line_1:
+                print('geocoding address...')
+                self.geocode_address(address)
             elif address.zip:
                 pass
             else:
@@ -43,39 +41,51 @@ class Geocoder:
         potential_places = []
         if address.zip:
             potential_places.append(self.places_by_zip(address.zip))
-        # we will *never* have city at this point in the algorithm.
 
-        if not potential_places:
-            tokens = address.address_line_1.split(' ')[-3:]
-            guess_tokens = []
-            # make all combinations of tokens
-            for idx, token in enumerate(tokens):
-                guess_tokens.append(token)
-                if idx > 0:
-                    guess_tokens[0] += token
-                if idx > 1:
-                    guess_tokens[1] += token
-            potential_places.append(self.places_by_city_list(guess_tokens))
+        # Prob should always do the guess..
+        guessed_places = self.guess_city(address.address_line_1)
+        if guessed_places:
+            potential_places += guessed_places
 
-        # Try and extract potential places from city from address string
-        potential_places = [p.city for p in potential_places]
+        # We are getting alot of cities as feedback...
+        for p in potential_places:
+            print('p:%s' % p)
+
         self.extract_city(address.address_line_1, potential_places)
+
+        print('Address Line 1: %s' % address.address_line_1)
+        print('City: %s' % address.city)
+        print('State: %s' % address.state )
 
         # We can find a city without a city, state and zip....
 
-    def extract_city(self, address, place_list):
+    def extract_city(self, address, potential_places):
         # Sort by longest string
         # match up against street_string
         # Return Place that fits OR None if none fit.
 
-        # MODIFY ALGO TO MATCH LAST LENGTHS...
-        place_list.sort(key=len)
-        place_list.reverse()
+        sorted_list = sorted(potential_places, key=lambda k: k.city)
+        for place in sorted_list:
+            # TODO: Fuzzy match this!
+            # TODO: what should we do with this?
+            if place.city in address.address_line_1:
+                address.address_line_1 = address.address_line_1.sub(place.city, '')
+                address.city = place.city
 
-        for place in place_list:
-            if place in address.address_line_1:
-                address.address_line_1 = address.address_line_1.replace(place, '')
-                break
+
+    def guess_city(self, address_string):
+        tokens = address_string.split(' ')[-3:]
+        guess_tokens = []
+        # make all combinations of tokens
+        for idx, token in enumerate(tokens):
+            guess_tokens.append(token)
+            if idx == 1:
+                guess_tokens.append('%s %s' % (guess_tokens[0], token))
+            if idx == 2:
+                guess_tokens.append('%s %s' % (guess_tokens[0], token))
+                guess_tokens.append('%s %s' % (guess_tokens[1], token))
+        guessed_places = self.places_by_city_list(guess_tokens)
+        return guessed_places
 
     def geocode_zipcode(self):
         pass

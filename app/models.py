@@ -18,6 +18,9 @@ class Place(Base):
     latitude = Column(Numeric(4, 10))
     longitude = Column(Numeric(4, 10))
 
+    def __str__(self):
+        return 'id: %s, zip: %s, city: %s, state: %s' % (self.id, self.zip, self.city, self.state)
+
 
 class AddrFeat(Base):
 
