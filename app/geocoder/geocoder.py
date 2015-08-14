@@ -39,20 +39,31 @@ class Geocoder:
         if address.zip:
             potential_places.append(self.places_by_zip(address.zip))
 
+        # We get alot of "noise" back in this, so only save off what we actually need
+        # Todo future: think about ranking them and taking top x ranked guesses.
         guessed_places = self.guess_city(address.address_line_1)
-
         guessed_places += potential_places
 
-        address, guessed_place = self.extract_city(address.address_line_1, potential_places)
+        print('Extracting City from string: %s' % address.address_line_1)
+        address, guessed_place = self.extract_city(address, guessed_places)
+        print('Guessed_Place: %s' % guessed_place)
 
         if not guessed_place:
-            print('Cannot find a for given address string!')
-            # Todo; geocode zip if available
+            print('Cannot find a for given address string: %s' % address)
+            # Todo; geocode zip if available?
             return None
 
-        potential_places += guessed_place
+        potential_places.append(guessed_place)
+        print('AddrFeat search for <%s>' % address.address_line_1)
 
+        """Will need to apply post parse logic as street names (fullname) are stored in dataset with standardization.
+        This is particularly difficult due to the may factors that are in an address string,
+        such as pre/post dir + types and the latter being in the acutal street name [EAST ST]
+        * Acutally, should try to tokenize the entire address and try combinations...
+        """
 
+        potential_addrfeats = self.addrfeats_by_street(address.address_line_1)
+        return potential_addrfeats
 
     def extract_city(self, address, potential_places):
         """ Given a list of potential strings, return
@@ -64,7 +75,7 @@ class Geocoder:
         for place in sorted_list:
             # TODO: Fuzzy match this!
             if place.city in address.address_line_1:
-                address.address_line_1 = address.address_line_1.sub(place.city, '')
+                address.address_line_1 = address.address_line_1.replace(place.city, '').strip()
                 address.city = place.city
                 return address, place
         return address, None
@@ -109,5 +120,9 @@ class Geocoder:
 
     def places_by_city_list(self, city_list):
         results = db.session.query(Place).filter(Place.city.in_(city_list)).all()
+        return results
+
+    def addrfeats_by_street(self, street):
+        results = db.session.query(AddrFeat).filter(AddrFeat.fullname == street).all()
         return results
 

@@ -33,6 +33,6 @@ class AddressParser:
         number = self.regex.number_regex.search(address_string)
         if number:
             address.number = number.group(0).strip()
-            address_string = address_string.replace(address.number, '')
+            address_string = address_string.replace(address.number, '').strip()
         address.address_line_1 = address_string
         return address

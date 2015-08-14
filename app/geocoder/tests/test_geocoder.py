@@ -33,10 +33,6 @@ class TestGeocoder(TestCase):
         results = self.geocoder.places_by_city_list(['MANORVILLE', 'TUCKAHOE'])
         assert len(results) > 0
 
-    def test_extract_city(self):
-        address = Address('testing')
-        address.address_line_1 = 'MCGUIRK STREET EAST HAMPTON'
-
     def test_guess_city(self):
         """ guess_city() """
         address_string ='6 CAPUTO DRIVE EAST MORICHES'
@@ -49,9 +45,30 @@ class TestGeocoder(TestCase):
         tokens = self.geocoder.guess_city(address_string)
         assert tokens == []
 
+    def test_extract_city(self):
+        """ extract_city() should find a city embeded into an address line string """
+        address = Address('testing')
+        address.address_line_1 = 'MCGUIRK STREET EAST HAMPTON'
+        potential_places = self.geocoder.guess_city(address.address_line_1)
+        address, city = self.geocoder.extract_city(address,potential_places)
+        # City is returning EAST HAMPTON, CONNETICUT.
+        assert address.address_line_1 == 'MCGUIRK STREET'
+        assert city.city == 'EAST HAMPTON'
+
+    def test_extract_city_FAIL(self):
+        """ if extract_city() fails to find a city, expect the address to be unchanged and found city to be None """
+        address = Address('testing')
+        address.address_line_1 = 'MCGUIRK STREET EAST HAMPTON'
+        potential_places = self.geocoder.guess_city('6 CAPUTO DRIVE MANORVILLE')
+        address, city = self.geocoder.extract_city(address,potential_places)
+        assert address.address_line_1 == 'MCGUIRK STREET EAST HAMPTON'
+        assert not city
+
+
     def test_all(self):
         address = '1 MCGUIRK STREET EAST HAMPTON NY 11934'
-        self.geocoder.geocode(address)
+        data = self.geocoder.geocode(address)
+        print('Geocode Address Results: %s' % data)
 
 if __name__ == '__main__':
     TestGeocoder()
