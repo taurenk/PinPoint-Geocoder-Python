@@ -35,43 +35,39 @@ class Geocoder:
             print('Traceback: %s' % traceback.format_exc())
 
     def geocode_address(self, address):
-        """ Try to further parse address in pieces.
-        :return:
-        """
         potential_places = []
         if address.zip:
             potential_places.append(self.places_by_zip(address.zip))
 
-        # Prob should always do the guess..
         guessed_places = self.guess_city(address.address_line_1)
-        if guessed_places:
-            potential_places += guessed_places
 
-        # We are getting alot of cities as feedback...
-        for p in potential_places:
-            print('p:%s' % p)
+        guessed_places += potential_places
 
-        self.extract_city(address.address_line_1, potential_places)
+        address, guessed_place = self.extract_city(address.address_line_1, potential_places)
 
-        print('Address Line 1: %s' % address.address_line_1)
-        print('City: %s' % address.city)
-        print('State: %s' % address.state )
+        if not guessed_place:
+            print('Cannot find a for given address string!')
+            # Todo; geocode zip if available
+            return None
 
-        # We can find a city without a city, state and zip....
+        potential_places += guessed_place
+
+
 
     def extract_city(self, address, potential_places):
-        # Sort by longest string
-        # match up against street_string
-        # Return Place that fits OR None if none fit.
-
+        """ Given a list of potential strings, return
+        :param address:
+        :param potential_places:
+        :return:
+        """
         sorted_list = sorted(potential_places, key=lambda k: k.city)
         for place in sorted_list:
             # TODO: Fuzzy match this!
-            # TODO: what should we do with this?
             if place.city in address.address_line_1:
                 address.address_line_1 = address.address_line_1.sub(place.city, '')
                 address.city = place.city
-
+                return address, place
+        return address, None
 
     def guess_city(self, address_string):
         tokens = address_string.split(' ')[-3:]
@@ -87,8 +83,15 @@ class Geocoder:
         guessed_places = self.places_by_city_list(guess_tokens)
         return guessed_places
 
-    def geocode_zipcode(self):
-        pass
+    def geocode_zipcode(self, zipcode):
+        """ Given a zipcode, return a matching Place.
+        :param zipcode:
+        :return: Place
+        """
+        results = self.places_by_zip(zipcode)
+        if results:
+            return results
+        return None
 
     def places_by_zip(self, zipcode):
         # Zipcodes should match 1 for 1 (uniquly), so return only one result.
