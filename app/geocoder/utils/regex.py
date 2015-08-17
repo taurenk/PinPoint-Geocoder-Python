@@ -25,6 +25,9 @@ class Regex:
         self.street_prefix_regex = re.compile(r'^(' + self._import_prefix_regex() + r')')
         self.secondary_str_regex = re.compile(r'(?:\s(' + self._import_secondary_regex() + r') \w+?)')
 
+        # Standards Mapping
+        self.cannonical_street_types = self._import_street_type_data()
+
     def _import_state_regex(self):
         """Generate the US States regex string """
         list = []
@@ -46,3 +49,13 @@ class Regex:
             list.append(key + r'\s?')
             list.append(Standards().tiger_prefix_types[key]+ r'\s?')
         return r'|'.join(list)
+
+    def _import_street_type_data(self):
+        street_type_dict = {}
+        usps_street_types = Standards().usps_street_types
+        for key in usps_street_types:
+            street_type_dict[key] = usps_street_types[key]
+        tiger_street_types = Standards().tiger_street_types
+        for key in tiger_street_types:
+            street_type_dict[key] = tiger_street_types[key]
+        return street_type_dict

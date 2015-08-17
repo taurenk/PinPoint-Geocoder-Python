@@ -268,6 +268,8 @@ class Standards:
             'VISTA' : 'VIS',
     }
 
+
+
     """ TIGER/LINE street type suffix.
     Street types taken from actual tiger/line database and
     ran against the suffix abbreviation listing*.

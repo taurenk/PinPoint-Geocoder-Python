@@ -33,6 +33,11 @@ class TestGeocoder(TestCase):
         results = self.geocoder.places_by_city_list(['MANORVILLE', 'TUCKAHOE'])
         assert len(results) > 0
 
+    def test_addrfeats_by_street(self):
+        results = self.geocoder.addrfeats_by_street('CAPUTO DR')
+        #print(results[0].fullname)
+        assert results[0].fullname == 'CAPUTO DR'
+
     def test_guess_city(self):
         """ guess_city() """
         address_string ='6 CAPUTO DRIVE EAST MORICHES'
@@ -64,6 +69,9 @@ class TestGeocoder(TestCase):
         assert address.address_line_1 == 'MCGUIRK STREET EAST HAMPTON'
         assert not city
 
+    def test_geocode_address(self):
+        # Need some base test cases ASAP!
+        pass
 
     def test_all(self):
         address = '1 MCGUIRK STREET EAST HAMPTON NY 11934'

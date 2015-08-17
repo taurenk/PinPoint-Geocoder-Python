@@ -19,7 +19,6 @@ class AddressParser:
             address_string = address_string.replace(address.zip, '').strip()
 
         state = self.regex.state_regex.search(address_string)
-        print(state)
 
         if state:
             address.state = state.group(0).strip().upper()
@@ -35,4 +34,19 @@ class AddressParser:
             address.number = number.group(0).strip()
             address_string = address_string.replace(address.number, '').strip()
         address.address_line_1 = address_string
+        return address
+
+    def post_parse_address(self, address):
+        """
+        :param address:
+        :return: address object
+        """
+        # Crudely standardize address
+        street_tokens = address.address_line_1.split(' ')
+
+        if street_tokens[-1] in self.regex.cannonical_street_types:
+            # swap value to standard abbreviation
+            street_tokens[-1] = self.regex.cannonical_street_types[street_tokens[-1]]
+
+        address.address_line_1 = ' '.join(street_tokens)
         return address

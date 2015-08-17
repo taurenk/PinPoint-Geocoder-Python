@@ -61,8 +61,12 @@ class Geocoder:
         such as pre/post dir + types and the latter being in the acutal street name [EAST ST]
         * Acutally, should try to tokenize the entire address and try combinations...
         """
+        address = AddressParser().post_parse_address(address)
+
+        print('Searching for address: <%s>' % address.address_line_1)
 
         potential_addrfeats = self.addrfeats_by_street(address.address_line_1)
+        print('potentails: %s' % potential_addrfeats)
         return potential_addrfeats
 
     def extract_city(self, address, potential_places):
