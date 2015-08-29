@@ -3,3 +3,4 @@ Flask-RESTful == 0.3.4
 Flask-SQLAlchemy == 2.0
 Flask-Testing
 SQLAlchemy == 1.0.8
+psycopg2 == 2.6.1
