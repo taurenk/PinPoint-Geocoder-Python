@@ -28,7 +28,6 @@ class AddressParser:
             if address.state in Standards().states:
                 address.state = self.standards.states[address.state.upper()]
 
-        # TODO: What if pre text? What if number LIKE A701?
         number = self.regex.number_regex.search(address_string)
         if number:
             address.number = number.group(0).strip()
@@ -44,6 +43,7 @@ class AddressParser:
         # Crudely standardize address
         street_tokens = address.address_line_1.split(' ')
 
+        # Take first value in street and see if we can standardize it.
         if street_tokens[-1] in self.regex.cannonical_street_types:
             # swap value to standard abbreviation
             street_tokens[-1] = self.regex.cannonical_street_types[street_tokens[-1]]

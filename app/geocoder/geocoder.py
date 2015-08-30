@@ -10,11 +10,11 @@ from app.models import Place, AddrFeat
 class Geocoder:
 
     def __init__(self):
-        pass
+        self.address_parser = AddressParser()
 
     def geocode(self, address_string):
         try:
-            address = AddressParser().parse_address_string(Address(address_string))
+            address = self.address_parser.parse_address_string(Address(address_string))
 
             """ Try to figure out as much knowledge about the given data as possible:
                 Case; Intersection - needs to pass 'intersection regex'
@@ -28,7 +28,7 @@ class Geocoder:
             elif address.zip:
                 pass
             else:
-                return None # throw 404
+                return None  # throw 404
 
         except Exception as error:
             print('Error occured while geocoding: %s' % error)
@@ -44,29 +44,30 @@ class Geocoder:
         guessed_places = self.guess_city(address.address_line_1)
         guessed_places += potential_places
 
-        print('Extracting City from string: %s' % address.address_line_1)
+        print('-Extracting City from string: %s' % address.address_line_1)
         address, guessed_place = self.extract_city(address, guessed_places)
-        print('Guessed_Place: %s' % guessed_place)
+        print('-Guessed_Place: %s' % guessed_place)
 
         if not guessed_place:
-            print('Cannot find a for given address string: %s' % address)
+            print('\t>>Cannot find a for given address string: %s' % address)
             # Todo; geocode zip if available?
             return None
 
         potential_places.append(guessed_place)
-        print('AddrFeat search for <%s>' % address.address_line_1)
+        print('-AddrFeat search for <%s>' % address.address_line_1)
 
         """Will need to apply post parse logic as street names (fullname) are stored in dataset with standardization.
         This is particularly difficult due to the may factors that are in an address string,
         such as pre/post dir + types and the latter being in the acutal street name [EAST ST]
         * Acutally, should try to tokenize the entire address and try combinations...
         """
-        address = AddressParser().post_parse_address(address)
+        address = self.adddress_parser.post_parse_address(address)
 
-        print('Searching for address: <%s>' % address.address_line_1)
+        print('-Searching for address: <%s>' % address.address_line_1)
 
         potential_addrfeats = self.addrfeats_by_street(address.address_line_1)
-        print('potentails: %s' % potential_addrfeats)
+        print('-Potential AddrFeats:')
+        [print('\t%s' % addrfeat) for addrfeat in potential_addrfeats]
         return potential_addrfeats
 
     def extract_city(self, address, potential_places):

@@ -8,6 +8,26 @@ from app import create_app, db
 from app.geocoder.geocoder import Geocoder
 from app.geocoder.address import Address
 
+
+class TestGeocodeAddress(TestCase):
+
+    def setUp(self):
+        self.geocoder = Geocoder()
+
+    def create_app(self):
+        """ Set up an app object with testing config """
+        app = Flask(__name__)
+        app.config.from_object('config')
+        db.init_app(app)
+        app.db = db
+        return app
+
+    def test_basic_address(self):
+        address = '1 MCGUIRK STREET EAST HAMPTON NY 11934'
+        data = self.geocoder.geocode(address)
+        print('Geocode Address Results: %s' % data)
+
+
 class TestGeocoder(TestCase):
 
     def setUp(self):
@@ -69,14 +89,5 @@ class TestGeocoder(TestCase):
         assert address.address_line_1 == 'MCGUIRK STREET EAST HAMPTON'
         assert not city
 
-    def test_geocode_address(self):
-        # Need some base test cases ASAP!
-        pass
 
-    def test_all(self):
-        address = '1 MCGUIRK STREET EAST HAMPTON NY 11934'
-        data = self.geocoder.geocode(address)
-        print('Geocode Address Results: %s' % data)
 
-if __name__ == '__main__':
-    TestGeocoder()

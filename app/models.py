@@ -44,3 +44,6 @@ class AddrFeat(Base):
     suftypabrv = Column(String(50))
 
     # geom = Column(Geometry('POLYGON'))
+
+    def __str__(self):
+        return '<%s - %s - %s>' % (self.fullname, self.zipl, self.state)

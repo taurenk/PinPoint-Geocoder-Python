@@ -16,7 +16,7 @@ class Address:
         """ Very helpful for testing!
         :return:
         """
-        return 'line1: %s, city: %s, state: %s. zip: %s' % (self.address_line_1, self.city, self.state, self.zip)
+        return '#: %s, line1: %s, city: %s, state: %s. zip: %s' % (self.number, self.address_line_1, self.city, self.state, self.zip)
 
     def to_json(self):
         return None
