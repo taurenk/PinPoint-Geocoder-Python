@@ -5,7 +5,6 @@ from flask.ext.restful import Resource, marshal, fields
 from .models import AddrFeat
 from app import db
 
-
 addrfeat_fields = {
     'gid': fields.Integer,
     'tlid': fields.Integer,
