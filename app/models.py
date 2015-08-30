@@ -1,6 +1,6 @@
 __author__ = 'Tauren'
 
-from sqlalchemy import Column, Numeric, Integer, String
+from sqlalchemy import Column, Numeric, Integer, String, orm
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -45,7 +45,12 @@ class AddrFeat(Base):
 
     # geom = Column(Geometry('POLYGON'))
 
-    def __init(self):
+    """
+    def __init__(self):
+        self.rank = 0
+    """
+    @orm.reconstructor
+    def init_on_load(self):
         self.rank = 0
 
     def __str__(self):

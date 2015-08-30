@@ -36,6 +36,12 @@ def check_number_range(fromnum, tonum, target):
     :param target:
     :return: True/False
     """
+    # Take into account None type
+    if not fromnum:
+        return False
+    if not tonum:
+        return False
+
     if fromnum <= target <= tonum:
         return True
     elif fromnum >= target >= tonum:
