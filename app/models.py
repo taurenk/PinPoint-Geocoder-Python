@@ -49,4 +49,6 @@ class AddrFeat(Base):
         self.rank = 0
 
     def __str__(self):
-        return '<%s - %s - %s>' % (self.fullname, self.zipl, self.state)
+        return '[%s - %s - %s - %s - %s]' % (self.rank, self.fullname, self.state, '%s/%s' % (self.zipl, self.zipr),
+                                             'L: <%s-%s> /R: <%s-%s>' % (self.lfromhn, self.ltohn,
+                                                                         self.rfromhn, self.rtohn))

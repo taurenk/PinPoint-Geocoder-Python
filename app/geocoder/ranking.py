@@ -3,8 +3,44 @@ __author__ = 'Tauren'
 from app.geocoder.address import Address
 
 def rank_address_candidates(address, addrfeat_list):
-    pass
+    """
+    :param address: Address Object
+    :param addrfeat_list: list if addrfeat candidates
+    :return: list of addrfeat objects with a rank_score set and sorted from high/low value
+    """
 
+    for addrfeat in addrfeat_list:
+        addrfeat.rank = 0
+
+        # Street
+        if address.address_line_1 == addrfeat.fullname:
+            addrfeat.rank += 1
+
+        # zipcode
+        if address.zip == addrfeat.zipl or address.zip == addrfeat.zipr:
+            addrfeat.rank += 1
+
+        # side of street
+        if check_number_range(addrfeat.lfromhn, addrfeat.ltohn, address.number):
+            addrfeat.rank += 1
+        elif check_number_range(addrfeat.rfromhn, addrfeat.rtohn, address.number):
+            addrfeat.rank += 1
+
+    addrfeat_list.sort(key=lambda x: x.rank, reverse=True)
+    return addrfeat_list
+
+def check_number_range(fromnum, tonum, target):
+    """ Given a target street number, deterime if it's in range
+    :param fromnum:
+    :param tonum:
+    :param target:
+    :return: True/False
+    """
+    if fromnum <= target <= tonum:
+        return True
+    elif fromnum >= target >= tonum:
+        return True
+    return False
 
 
 # def rank_candidates(self, address, candidates):
