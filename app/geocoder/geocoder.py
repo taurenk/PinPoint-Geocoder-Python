@@ -35,12 +35,13 @@ class Geocoder:
             print('Traceback: %s' % traceback.format_exc())
 
     def geocode_address(self, address):
+
+        # TODO; break this off into it's own function...
         potential_places = []
         if address.zip:
             potential_places.append(self.places_by_zip(address.zip))
 
         # We get alot of "noise" back in this, so only save off what we actually need
-        # Todo future: think about ranking them and taking top x ranked guesses.
         address, guessed_place = self.extract_city(address, potential_places)
         if guessed_place:
             print('\t-We found the city [1-1]: %s' % guessed_place)
@@ -54,7 +55,6 @@ class Geocoder:
 
         if not guessed_place:
             print('\t>>Cannot find a for given address string: %s' % address)
-            # Todo; geocode zip if available?
             return None
 
         potential_places.append(guessed_place)
