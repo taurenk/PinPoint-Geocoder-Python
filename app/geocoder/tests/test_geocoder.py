@@ -7,11 +7,12 @@ from app import create_app, db
 
 from app.geocoder.geocoder import Geocoder
 from app.geocoder.address import Address
-
+from app.geocoder.tests import test_addresses
 
 class TestGeocodeAddress(TestCase):
 
     def setUp(self):
+        self.address_dict = test_addresses.test_address_dict
         self.geocoder = Geocoder()
 
     def create_app(self):
@@ -22,11 +23,22 @@ class TestGeocodeAddress(TestCase):
         app.db = db
         return app
 
-    def test_basic_address(self):
-        address = '1 MCGUIRK STREET EAST HAMPTON NY 11934'
+    def test_geocoding_basic_addresses(self):
+        address = '6 Caputo Drive Manorville NY 11949'
+        parsed_address = self.address_dict['6 Caputo Drive Manorville NY 11949']
         data = self.geocoder.geocode(address)
-        print('Geocode Address Results: %s' % data)
+        print('Geocode Address Results: %s\n' % data)
 
+        address = '1 Canal View Dr, Center Moriches, NY 11934'
+        parsed_address = self.address_dict['1 Canal View Dr, Center Moriches, NY 11934']
+        data = self.geocoder.geocode(address)
+        print('Geocode Address Results: %s\n' % data)
+
+        # 492 Montauk Hwy, East Moriches, NY 11940
+        address = '492 Montauk Hwy, East Moriches, NY 11940'
+        parsed_address = self.address_dict['492 Montauk Hwy, East Moriches, NY 11940']
+        data = self.geocoder.geocode(address)
+        print('Geocode Address Results: %s\n' % data)
 
 class TestGeocoder(TestCase):
 

@@ -41,12 +41,16 @@ class Geocoder:
 
         # We get alot of "noise" back in this, so only save off what we actually need
         # Todo future: think about ranking them and taking top x ranked guesses.
-        guessed_places = self.guess_city(address.address_line_1)
-        guessed_places += potential_places
+        address, guessed_place = self.extract_city(address, potential_places)
+        if guessed_place:
+            print('\t-We found the city [1-1]: %s' % guessed_place)
+        else:
+            guessed_places = self.guess_city(address.address_line_1)
+            guessed_places += potential_places
 
-        print('-Extracting City from string: %s' % address.address_line_1)
-        address, guessed_place = self.extract_city(address, guessed_places)
-        print('-Guessed_Place: %s' % guessed_place)
+            print('-Guessing City: %s' % address.address_line_1)
+            address, guessed_place = self.extract_city(address, guessed_places)
+            print('-Guessed_Place: %s' % guessed_place)
 
         if not guessed_place:
             print('\t>>Cannot find a for given address string: %s' % address)
@@ -61,7 +65,7 @@ class Geocoder:
         such as pre/post dir + types and the latter being in the acutal street name [EAST ST]
         * Acutally, should try to tokenize the entire address and try combinations...
         """
-        address = self.adddress_parser.post_parse_address(address)
+        address = self.address_parser.post_parse_address(address)
 
         print('-Searching for address: <%s>' % address.address_line_1)
 
@@ -78,6 +82,7 @@ class Geocoder:
         """
         sorted_list = sorted(potential_places, key=lambda k: k.city)
         for place in sorted_list:
+            print('Potential City: %s' % place)
             # TODO: Fuzzy match this!
             if place.city in address.address_line_1:
                 address.address_line_1 = address.address_line_1.replace(place.city, '').strip()

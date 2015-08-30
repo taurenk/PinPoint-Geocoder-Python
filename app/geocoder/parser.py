@@ -1,5 +1,6 @@
 __author__ = 'Tauren'
 
+import re
 from app.geocoder.utils.regex import Regex
 from app.geocoder.utils.standards import Standards
 
@@ -12,6 +13,10 @@ class AddressParser:
 
     def parse_address_string(self, address):
         address_string = address.address_string.upper()
+
+        # Remove excess spaces + commas
+        address_string = re.sub('\s\s+', '', address_string)
+        address_string = address_string.replace(',', '')
 
         zip = self.regex.zip_regex.search(address_string)
         if zip:
