@@ -1,7 +1,9 @@
 __author__ = 'Tauren'
 
-from sqlalchemy import Column, Numeric, Integer, String, orm
+
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Numeric, Integer, String, orm
+from geoalchemy2 import Geometry
 
 Base = declarative_base()
 
@@ -19,7 +21,7 @@ class Place(Base):
     longitude = Column(Numeric(4, 10))
 
     def __str__(self):
-        return 'id: %s, zip: %s, city: %s, state: %s' % (self.id, self.zip, self.city, self.state)
+        return '[id: %s, zip: %s, city: %s, state: %s]' % (self.id, self.zip, self.city, self.state)
 
 
 class AddrFeat(Base):
@@ -43,17 +45,14 @@ class AddrFeat(Base):
     pretypabrv = Column(String(50))
     suftypabrv = Column(String(50))
 
-    # geom = Column(Geometry('POLYGON'))
+    geom = Column(Geometry('MULTILINESTRING'))
 
-    """
-    def __init__(self):
-        self.rank = 0
-    """
     @orm.reconstructor
     def init_on_load(self):
         self.rank = 0
 
     def __str__(self):
-        return '[%s - %s - %s - %s - %s]' % (self.rank, self.fullname, self.state, '%s/%s' % (self.zipl, self.zipr),
+        return '[%s - %s - %s - %s - %s - <%s>]' % (self.rank, self.fullname, self.state, '%s/%s' % (self.zipl, self.zipr),
                                              'L: <%s-%s> /R: <%s-%s>' % (self.lfromhn, self.ltohn,
-                                                                         self.rfromhn, self.rtohn))
+                                                                         self.rfromhn, self.rtohn),
+                                                    self.geom)

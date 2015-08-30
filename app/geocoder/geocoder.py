@@ -72,6 +72,12 @@ class Geocoder:
         potential_addrfeats = self.addrfeats_by_street(address.address_line_1)
         print('-Potential AddrFeats:')
         [print('\t%s' % addrfeat) for addrfeat in potential_addrfeats]
+
+        print('>> %s' % potential_addrfeats[0])
+        data = potential_addrfeats[0].geom.ST_buffer(2).ST_Area()
+        #lake.geom.ST_Buffer(2).ST_Area()
+
+        print('\t>data: %s' % data)
         return potential_addrfeats
 
     def extract_city(self, address, potential_places):

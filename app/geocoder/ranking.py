@@ -1,7 +1,5 @@
 __author__ = 'Tauren'
 
-from app.geocoder.address import Address
-
 def rank_address_candidates(address, addrfeat_list):
     """
     :param address: Address Object

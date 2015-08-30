@@ -29,6 +29,7 @@ class TestGeocodeAddress(TestCase):
         data = self.geocoder.geocode(address)
         print('Geocode Address Results: %s\n' % data)
 
+        """
         address = '1 Canal View Dr, Center Moriches, NY 11934'
         parsed_address = self.address_dict['1 Canal View Dr, Center Moriches, NY 11934']
         data = self.geocoder.geocode(address)
@@ -39,6 +40,7 @@ class TestGeocodeAddress(TestCase):
         parsed_address = self.address_dict['492 Montauk Hwy, East Moriches, NY 11940']
         data = self.geocoder.geocode(address)
         print('Geocode Address Results: %s\n' % data)
+        """
 
 class TestExtractCity(TestCase):
 
