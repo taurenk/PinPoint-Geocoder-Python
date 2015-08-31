@@ -5,3 +5,4 @@ Flask-Testing
 SQLAlchemy == 1.0.8
 psycopg2 == 2.6.1
 geoalchemy2 == 0.2.5
+shapely == 1.5.12
