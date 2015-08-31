@@ -72,8 +72,6 @@ class Geocoder:
         potential_addrfeats = self.addrfeats_by_street(address.address_line_1)
         print('-Potential AddrFeats:')
         [print('\t%s' % addrfeat) for addrfeat in potential_addrfeats]
-
-
         return potential_addrfeats
 
     def extract_city(self, address, potential_places):
