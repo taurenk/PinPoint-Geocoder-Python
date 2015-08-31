@@ -73,16 +73,7 @@ class Geocoder:
         print('-Potential AddrFeats:')
         [print('\t%s' % addrfeat) for addrfeat in potential_addrfeats]
 
-        print('>> %s' % potential_addrfeats[0])
-        data = potential_addrfeats[0].geom
 
-        from shapely import wkb, wkt
-        from binascii import unhexlify
-        binary = unhexlify(data.desc)
-        point = wkb.loads(binary)
-        d = wkt.dumps(point)
-        # 'POINT (51.9035420000000016 4.4598599999999999)'
-        print('D: %s' % d)
         return potential_addrfeats
 
     def extract_city(self, address, potential_places):
