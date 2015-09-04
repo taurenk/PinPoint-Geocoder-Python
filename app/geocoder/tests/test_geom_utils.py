@@ -21,6 +21,6 @@ class TestGeocodeAddress(TestCase):
     def test_convert_geom_points(self):
         geom = self.address.geom
         points_list = convert_geom_to_points(geom)
-        print(points_list)
+        # print(points_list)
         assert points_list[0][0] == '-72.7938789999999898'
         assert points_list[0][1] == '40.8591690000000014'

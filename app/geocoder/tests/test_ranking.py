@@ -1,12 +1,13 @@
 __author__ = 'Tauren'
 
+import unittest
 from flask.ext.testing import TestCase
 from flask import Flask
 
 from app import db
 from app.models import AddrFeat
 from app.geocoder.address import Address
-from app.geocoder.ranking import rank_address_candidates
+from app.geocoder.ranking import rank_address_candidates, check_number_range
 
 class TestAddressRankingBasic(TestCase):
 
@@ -74,3 +75,22 @@ class TestAddressRankingAdvanced(TestCase):
         assert candidates[2].rank == 2
         assert candidates[3].gid == 752160
         assert candidates[3].rank == 2
+
+class TestCheckNumberRange(unittest.TestCase):
+
+    def test_check_number_range_same_side(self):
+        test1 = check_number_range('1', '10', '5')
+        print(test1)
+        assert test1
+
+        test2 = check_number_range('1', '10', '10')
+        assert test2
+
+        test3 = check_number_range('10', '1', '5')
+        assert test3
+
+        test4 = check_number_range('10', '1', '1')
+        assert test4
+
+
+
