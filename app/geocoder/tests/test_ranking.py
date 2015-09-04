@@ -78,9 +78,21 @@ class TestAddressRankingAdvanced(TestCase):
 
 class TestCheckNumberRange(unittest.TestCase):
 
-    def test_check_number_range_same_side(self):
+    def test_check_number_range_null(self):
+        test1 = check_number_range(None, '10', '5')
+        assert not  test1
+
+        test2 = check_number_range('1', None, '10')
+        assert not test2
+
+        test3 = check_number_range('10', '1', None)
+        assert not test3
+
+        test3 = check_number_range('10', None, None)
+        assert not test3
+
+    def test_check_number_range_with_ints(self):
         test1 = check_number_range('1', '10', '5')
-        print(test1)
         assert test1
 
         test2 = check_number_range('1', '10', '10')
@@ -92,5 +104,8 @@ class TestCheckNumberRange(unittest.TestCase):
         test4 = check_number_range('10', '1', '1')
         assert test4
 
+    def test_check_number_range_with_alphanumeric(self):
+        test1 = check_number_range('1A', '10', '5')
+        assert not test1
 
 

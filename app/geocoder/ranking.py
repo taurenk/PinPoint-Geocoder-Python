@@ -35,14 +35,18 @@ def check_number_range(fromnum, tonum, target):
     :return: True/False
     """
     # Take into account None type
-    if not fromnum:
+    if (not fromnum) or (not tonum) or (not target):
         return False
-    if not tonum:
+    # Try converting to numeric value
+    # Todo; need to parse out alpha numeric
+    try:
+        fn, tn, t = int(fromnum), int(tonum), int(target)
+    except ValueError:
         return False
 
-    if fromnum <= target <= tonum:
+    if fn <= t <= tn:
         return True
-    elif fromnum >= target >= tonum:
+    elif fn >= t >= tn:
         return True
     return False
 
