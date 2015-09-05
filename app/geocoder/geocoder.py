@@ -6,6 +6,7 @@ from app import db
 from .address import Address
 from .parser import AddressParser
 from app.models import Place, AddrFeat
+import app.geocoder.ranking
 
 class Geocoder:
 
@@ -72,6 +73,10 @@ class Geocoder:
         potential_addrfeats = self.addrfeats_by_street(address.address_line_1)
         print('-Potential AddrFeats:')
         [print('\t%s' % addrfeat) for addrfeat in potential_addrfeats]
+        ranked_address = app.geocoder.ranking.rank_address_candidates(address, potential_addrfeats)
+        print('Ranked:')
+        [print('\t>%s' % addrfeat) for addrfeat in ranked_address]
+
         return potential_addrfeats
 
     def extract_city(self, address, potential_places):
