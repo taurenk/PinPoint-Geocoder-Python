@@ -1,4 +1,5 @@
 __author__ = 'Tauren'
+import re
 
 def rank_address_candidates(address, addrfeat_list):
     """
@@ -34,15 +35,17 @@ def check_number_range(fromnum, tonum, target):
     :param target:
     :return: True/False
     """
-    # Take into account None type
     if (not fromnum) or (not tonum) or (not target):
         return False
-    # Try converting to numeric value
-    # Todo; need to parse out alpha numeric
+    #Todo; calculate odd/even sides
     try:
-        fn, tn, t = int(fromnum), int(tonum), int(target)
+        fn = int(re.sub('[^0-9]', '', fromnum))
+        tn = int(re.sub('[^0-9]', '', tonum))
+        t = int(re.sub('[^0-9]', '', target))
     except ValueError:
         return False
+    except Exception as err:
+        print('Error Converting number range: %s' % err)
 
     if fn <= t <= tn:
         return True
