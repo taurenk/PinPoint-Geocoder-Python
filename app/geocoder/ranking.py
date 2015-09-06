@@ -1,5 +1,6 @@
 __author__ = 'Tauren'
-import re
+
+from app.geocoder.utils import geo_utils
 
 def rank_address_candidates(address, addrfeat_list):
     """
@@ -20,39 +21,19 @@ def rank_address_candidates(address, addrfeat_list):
             addrfeat.rank += 1
 
         # side of street
-        if check_number_range(addrfeat.lfromhn, addrfeat.ltohn, address.number):
-            addrfeat.rank += 1
-        elif check_number_range(addrfeat.rfromhn, addrfeat.rtohn, address.number):
-            addrfeat.rank += 1
+        try:
+            left_from_num, left_to_num, target = geo_utils.convert_strings_to_float(addrfeat.lfromhn, addrfeat.ltohn, address.number)
+            right_from_num, right_to_num, target = geo_utils.convert_strings_to_float(addrfeat.lfromhn, addrfeat.ltohn, address.number)
+
+            if geo_utils.check_number_range(left_from_num, left_to_num, target):
+                addrfeat.rank += 1
+            elif geo_utils.check_number_range(right_from_num, right_to_num, target):
+                addrfeat.rank += 1
+        except:
+            pass
 
     addrfeat_list.sort(key=lambda x: x.rank, reverse=True)
     return addrfeat_list
-
-def check_number_range(fromnum, tonum, target):
-    """ Given a target street number, deterime if it's in range
-    :param fromnum:
-    :param tonum:
-    :param target:
-    :return: True/False
-    """
-    if (not fromnum) or (not tonum) or (not target):
-        return False
-    #Todo; calculate odd/even sides
-    try:
-        fn = int(re.sub('[^0-9]', '', fromnum))
-        tn = int(re.sub('[^0-9]', '', tonum))
-        t = int(re.sub('[^0-9]', '', target))
-    except ValueError:
-        return False
-    except Exception as err:
-        print('Error Converting number range: %s' % err)
-
-    if fn <= t <= tn:
-        return True
-    elif fn >= t >= tn:
-        return True
-    return False
-
 
 # def rank_candidates(self, address, candidates):
 #         """ Scoring Algorithm for potential candidates

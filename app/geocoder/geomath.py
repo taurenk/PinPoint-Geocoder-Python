@@ -1,6 +1,7 @@
 __author__ = 'Tauren'
 
 from math import radians, sin, cos, atan2, sqrt, degrees, asin, pi
+import app.geocoder.ranking
 
 def haversine(lat1, lon1, lat2, lon2):
     """ Calculate the great circle distance between two points
@@ -38,10 +39,28 @@ def find_point(lat, lon, bearing, distance):
     new_lon = (new_lon+3*pi) % (2*pi) - pi #normalize...
     return [degrees(new_lat), degrees(new_lon)]
 
-def interpolate(points_list, target_number):
-    pass
-    #
+def interpolate(points_list, target_number, lfrom, lto, rfrom, rto):
 
+    from_number, to_number = None, None
+    if app.geocoder.ranking.check_number_range(lfrom, lto, target_number):
+        from_number, to_number = lfrom, lto
+    elif app.geocoder.ranking.check_number_range(rfrom, rto, target_number):
+         from_number, to_number = rfrom, rto
+    else:
+        return from_number, to_number
+
+    if from_number < to_number:
+        temp = from_number
+        from_number = from_number
+        to_number = temp
+
+    dist_dict = {}
+    # Confirmed; all records have atleast 2 points
+    for idx in range(len(points_list)-1):
+        dist_dict[idx] = haversine(points_list[idx][1], points_list[idx][0],
+                                   points_list[idx+1][1], points_list[idx+1][0])
+
+    print('Dist dict: %s' % dist_dict)
 
 #
 # def interpolate(self,candidate, address):
