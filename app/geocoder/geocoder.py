@@ -17,20 +17,12 @@ class Geocoder:
         try:
             address = self.address_parser.parse_address_string(Address(address_string))
 
-            """ Try to figure out as much knowledge about the given data as possible:
-                Case; Intersection - needs to pass 'intersection regex'
-                Case; Normal Address
-                Case; City/State/Zip
-                    - Here we want to figure out what we can and return it!
-            """
             if address.address_line_1:
                 print('geocoding address...')
                 address = self.geocode_address(address)
                 return address
-            elif address.zip:
-                pass
             else:
-                return None  # throw 404
+                return None
 
         except Exception as error:
             print('Error occured while geocoding: %s' % error)
@@ -107,16 +99,6 @@ class Geocoder:
                 guess_tokens.append('%s %s' % (guess_tokens[1], token))
         guessed_places = self.places_by_city_list(guess_tokens)
         return guessed_places
-
-    def geocode_zipcode(self, zipcode):
-        """ Given a zipcode, return a matching Place.
-        :param zipcode:
-        :return: Place
-        """
-        results = self.places_by_zip(zipcode)
-        if results:
-            return results
-        return None
 
     def places_by_zip(self, zipcode):
         # Zipcodes should match 1 for 1 (uniquly), so return only one result.

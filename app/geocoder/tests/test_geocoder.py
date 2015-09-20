@@ -40,6 +40,19 @@ class TestGeocodeAddress(TestCase):
         data = self.geocoder.geocode(address)
         print('Geocode Address Results: %s\n' % data)
 
+    def test_geocoding_partial_addresses(self):
+        address = 'Manorville NY 11949'
+        data = self.geocoder.geocode(address)
+        print('Geocode Address Results: %s\n' % data)
+
+        address = 'NY'
+        data = self.geocoder.geocode(address)
+        print('Geocode Address Results: %s\n' % data)
+
+        address = 'NY 10707'
+        data = self.geocoder.geocode(address)
+        print('Geocode Address Results: %s\n' % data)
+
 class TestExtractCity(TestCase):
 
     def setUp(self):

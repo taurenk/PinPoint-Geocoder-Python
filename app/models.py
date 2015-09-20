@@ -56,3 +56,29 @@ class AddrFeat(Base):
                                              'L: <%s-%s> /R: <%s-%s>' % (self.lfromhn, self.ltohn,
                                                                          self.rfromhn, self.rtohn),
                                                     self.geom)
+
+class AddressResult:
+    """ class for an address result"""
+
+    def __init__(self, addrfeat=None, place=None):
+        self.street_line_1 = None
+        self.street_line_2 = None
+        self.city = None
+        self.state = None
+        self.zipcode = None
+        self.zip_plus_four = None
+        self.lattitude = None
+        self.longitude = None
+
+    def convert_addrfeat(self, addrfeat):
+        pass
+    def convert_place(self, place):
+        pass
+
+    def to_json(self):
+        dict = {'street_line_1': self.street_line_1,
+                'city': self.city,
+                'state': self.state,
+                'zip': self.zipcode
+                }
+        return dict
