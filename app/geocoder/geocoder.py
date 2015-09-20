@@ -30,30 +30,29 @@ class Geocoder:
 
     def geocode_address(self, address):
 
-        # TODO; break this off into it's own function...
+        # 1. Find Zipcode
         potential_places = []
         if address.zip:
             potential_places.append(self.places_by_zip(address.zip))
 
-        # We get alot of "noise" back in this, so only save off what we actually need
+        # 2a. extract city based on found zip or 'guess'
         address, guessed_place = self.extract_city(address, potential_places)
-        if guessed_place:
-            print('\t-We found the city [1-1]: %s' % guessed_place)
-        else:
+        # 2b. if no city is found, try and guess by potential string combinations
+        if not guessed_place:
             guessed_places = self.guess_city(address.address_line_1)
             guessed_places += potential_places
-
-            print('-Guessing City: %s' % address.address_line_1)
             address, guessed_place = self.extract_city(address, guessed_places)
-            print('-Guessed_Place: %s' % guessed_place)
 
+        # 3. If there is no place, do something....
+        #     case; if zip return that.
         if not guessed_place:
-            print('\t>>Cannot find a for given address string: %s' % address)
+            print('\t>Cannot find a for given address string: %s' % address)
             return None
 
         potential_places.append(guessed_place)
         print('-AddrFeat search for <%s>' % address.address_line_1)
 
+        # 4. Post parse the address
         """Will need to apply post parse logic as street names (fullname) are stored in dataset with standardization.
         This is particularly difficult due to the may factors that are in an address string,
         such as pre/post dir + types and the latter being in the acutal street name [EAST ST]
@@ -61,12 +60,20 @@ class Geocoder:
         """
         address = self.address_parser.post_parse_address(address)
 
-        print('-Searching for address: <%s>' % address.address_line_1)
+        # 5. figure if we have no address....what now?
+        if not address.address_line_1:
+            return None
 
+        # 6. search for potential addrfeats
+        print('-Searching for address: <%s>' % address.address_line_1)
         potential_addrfeats = self.addrfeats_by_street(address.address_line_1)
+
+        # 7. rank potential addrfeats
         ranked_addresses = app.geocoder.ranking.rank_address_candidates(address, potential_addrfeats)
         print('Ranked Results:')
         [print('\t>%s' % addrfeat) for addrfeat in ranked_addresses]
+
+        #8. Interpolate coordinates
 
         return ranked_addresses[0]
 
@@ -74,11 +81,10 @@ class Geocoder:
         """ Given a list of potential strings, return
         :param address:
         :param potential_places:
-        :return:
+        :return: address object, extracted city string
         """
         sorted_list = sorted(potential_places, key=lambda k: k.city)
         for place in sorted_list:
-            print('Potential City: %s' % place)
             # TODO: Fuzzy match this!
             if place.city in address.address_line_1:
                 address.address_line_1 = address.address_line_1.replace(place.city, '').strip()
@@ -87,6 +93,10 @@ class Geocoder:
         return address, None
 
     def guess_city(self, address_string):
+        """ Parse and address string into tokens. Run tokens against database to produce potentual cities
+        :param address_string:
+        :return: list of Place objects
+        """
         tokens = address_string.split(' ')[-3:]
         guess_tokens = []
         # make all combinations of tokens
