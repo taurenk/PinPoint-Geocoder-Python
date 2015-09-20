@@ -25,7 +25,8 @@ class Geocoder:
             """
             if address.address_line_1:
                 print('geocoding address...')
-                self.geocode_address(address)
+                address = self.geocode_address(address)
+                return address
             elif address.zip:
                 pass
             else:
@@ -71,13 +72,11 @@ class Geocoder:
         print('-Searching for address: <%s>' % address.address_line_1)
 
         potential_addrfeats = self.addrfeats_by_street(address.address_line_1)
-        print('-Potential AddrFeats:')
-        [print('\t%s' % addrfeat) for addrfeat in potential_addrfeats]
-        ranked_address = app.geocoder.ranking.rank_address_candidates(address, potential_addrfeats)
-        print('Ranked:')
-        [print('\t>%s' % addrfeat) for addrfeat in ranked_address]
+        ranked_addresses = app.geocoder.ranking.rank_address_candidates(address, potential_addrfeats)
+        print('Ranked Results:')
+        [print('\t>%s' % addrfeat) for addrfeat in ranked_addresses]
 
-        return potential_addrfeats
+        return ranked_addresses[0]
 
     def extract_city(self, address, potential_places):
         """ Given a list of potential strings, return
