@@ -6,10 +6,10 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 def create_app():
-
     from .placeApi import PlaceApi
-
+    from .geocoderApi import GeocoderApi
     app = Flask(__name__)
     app.config.from_object('config')
 
@@ -17,5 +17,6 @@ def create_app():
     app.db = db
     api = Api(app)
     api.add_resource(PlaceApi, '/api/v1.0/place/<string:city>')
+    api.add_resource(GeocoderApi, '/api/v1.0/geocoder/<string:address_string>')
 
     return app
