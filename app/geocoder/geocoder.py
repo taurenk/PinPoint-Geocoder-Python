@@ -67,27 +67,26 @@ class Geocoder:
         # Todo; tokenize address line string
         zips = [place.zip for place in place_candidates]
         addr_candidates = self.addrfeat_by_street_and_zips(address.address_line_1, zips)
-
+        for a in addr_candidates:
+            print("AC: %s" % a)
         return addr_feats
 
     def addrfeat_by_street_and_zips(self, street_name, zipcodes):
-        filters = [AddrFeat.fullname == street_name]
+        primary, secondary = self.metaphone.process(street_name)
+        filters = [AddrFeat.fullname_metaphone.in_([primary, secondary])]
 
-        # Todo add in dmetaphone
         if zipcodes:
-            filters.append([AddrFeat.zipl.in_(zipcodes)])
-            filters.append([AddrFeat.zipr.in_(zipcodes)])
+            filters.append(AddrFeat.zipl.in_(zipcodes))
+            filters.append(AddrFeat.zipr.in_(zipcodes))
 
         results = db.session.query(AddrFeat).filter(*filters).all()
-        logger.info("")
+        logger.info("addrfeat_by_street_and_zips for street_name '%s' and zips '%s' results: %s" % (street_name, zipcodes, len(results)))
         return results
-
 
     def places_by_zip(self, zipcode):
         results = db.session.query(Place).filter(Place.zip == zipcode).all()
         logger.info("places_by_zip for zip %s. results count: %s" % (zipcode, len(results)))
         return results
-
 
     def places_by_city(self, city, state_code=None, zip=None):
         # Todo; Should tokenize city into possible permutations

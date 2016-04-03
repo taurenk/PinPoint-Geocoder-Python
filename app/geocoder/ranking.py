@@ -14,3 +14,7 @@ def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
 
     city_candidates.sort(key=lambda x: x.score, reverse=True)
     return city_candidates
+
+
+def rank_address_candidates(street, city, zip, addrfeat_candidates):
+    pass

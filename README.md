@@ -1,5 +1,6 @@
 #PinPoint Geocoder 
 
+[![Build Status](https://travis-ci.org/taurenk/PinPoint-Geocoder-Python.svg?branch=master)](https://travis-ci.org/taurenk/PinPoint-Geocoder-Python)
 [![Coverage Status](https://coveralls.io/repos/github/taurenk/PinPoint-Geocoder-Python/badge.svg?branch=master)](https://coveralls.io/github/taurenk/PinPoint-Geocoder-Python?branch=master)
 
 PinPoint is an Open Source Geocoding toolkit based off of TIGER/LINE and geonames.org data.

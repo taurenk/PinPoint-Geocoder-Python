@@ -36,6 +36,7 @@ class AddrFeat(Base):
     gid = Column(Integer, primary_key=True)
     tlid = Column(Integer)
     fullname = Column(String(100))
+    fullname_metaphone = Column(String(10))
     # Left/Right street data
     lfromhn = Column(String(12))
     ltohn = Column(String(12))
@@ -48,3 +49,7 @@ class AddrFeat(Base):
     @orm.reconstructor
     def init_on_load(self):
         self.score = 0
+
+    def __str__(self):
+        return '[id: %s, fullname: %s, meta: %s, zipl: %s, zipr: %s]' % (
+            self.tlid, self.fullname, self.fullname_metaphone, self.zipl, self.zipr)
