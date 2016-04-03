@@ -1,6 +1,6 @@
 #PinPoint Geocoder 
 
-https://circleci.com/gh/taurenk/PinPoint-Geocoder-Python.svg?style=shield&circle-token=1885263aee8c8d93993b8e7dc8d8a3f53a02a6f7
+[![Build Status](https://circleci.com/gh/taurenk/PinPoint-Geocoder-Python.svg?style=shield&circle-token=1885263aee8c8d93993b8e7dc8d8a3f53a02a6f7)]
 
 PinPoint is an Open Source Geocoding toolkit based off of TIGER/LINE and geonames.org data.
 If you have any questions please feel free to contact me at tauren.kristich@gmail.com
