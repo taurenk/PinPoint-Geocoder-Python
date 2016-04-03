@@ -5,8 +5,8 @@ def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
 
     for candidate in city_candidates:
 
-        if addr_city == candidate.city:
-            candidate.score += 1
+        if addr_city.title() == candidate.city:
+            candidate.score += 2
         if addr_state == candidate.state_code:
             candidate.score += 1
         if addr_zip == candidate.zip:
