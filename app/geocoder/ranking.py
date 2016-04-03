@@ -1,96 +1,16 @@
 __author__ = 'Tauren'
 
-from app.geocoder.utils import geo_utils
 
-def rank_address_candidates(address, addrfeat_list):
-    """
-    :param address: Address Object
-    :param addrfeat_list: list if addrfeat candidates
-    :return: list of addrfeat objects with a rank_score set and sorted from high/low value
-    """
+def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
 
-    for addrfeat in addrfeat_list:
-        addrfeat.rank = 0
+    for candidate in city_candidates:
 
-        # Street
-        if address.address_line_1 == addrfeat.fullname:
-            addrfeat.rank += 1
+        if addr_city.title() == candidate.city:
+            candidate.score += 2
+        if addr_state == candidate.state_code:
+            candidate.score += 1
+        if addr_zip == candidate.zip:
+            candidate.score += 1
 
-        # zipcode
-        if address.zip == addrfeat.zipl or address.zip == addrfeat.zipr:
-            addrfeat.rank += 1
-
-        # side of street
-        try:
-            left_from_num, left_to_num, target = geo_utils.convert_strings_to_float(addrfeat.lfromhn, addrfeat.ltohn, address.number)
-            right_from_num, right_to_num, target = geo_utils.convert_strings_to_float(addrfeat.lfromhn, addrfeat.ltohn, address.number)
-
-            if geo_utils.check_number_range(left_from_num, left_to_num, target):
-                addrfeat.rank += 1
-            elif geo_utils.check_number_range(right_from_num, right_to_num, target):
-                addrfeat.rank += 1
-        except:
-            pass
-
-    addrfeat_list.sort(key=lambda x: x.rank, reverse=True)
-    return addrfeat_list
-
-# def rank_candidates(self, address, candidates):
-#         """ Scoring Algorithm for potential candidates
-#         1. zip
-#         """
-#         """
-#         0   1       2     3         4            5           6      7       8     9     10    11
-#         gid, tlid, name, score, predirabrv, pretypabrv,suftypabrv, zipl, lcity, zipr, rcity, state, " +\
-#         12         13      14       15     16
-#         lfromhn, ltohn, rfromhn, rtohn, ST_asText(geom)
-#         """
-#         candidate_list = []
-#         for candidate in candidates:
-#             score = 0
-#
-#             # Street Score
-#             if candidate[2] == address.street1: score += 1
-#             else: score += 1/candidate[3]
-#
-#             # street type
-#             if candidate[6]:
-#                 if candidate[6].upper() == address.street1_type: score += 1
-#
-#             # TODO:Pre/Post Directions
-#
-#             # zipcode
-#             if candidate[7] == address.zip: score += 1
-#             elif candidate[9] == address.zip: score += 1
-#
-#             # city
-#             if candidate[8] == address.city: score += 2
-#             elif candidate[10] == address.city: score += 2
-#
-#             # Figure out ranges piece
-#             # TODO: Add which side the point was hitp->this will help in interpolation.
-#             addr_score = 0
-#             side_flag = None
-#             if address.number:
-#                 i = 12
-#                 while i <= 15:
-#                     try:
-#                         if candidate[i] and '-' in candidate[i]: candidate[i]=self.convert_number(candidate[i])
-#                         if (candidate[i+1] and '-' in candidate[i+1]): candidate[i+1]=self.convert_number(candidate[i+1])
-#                         addr_score += self.check_range(
-#                                 int(candidate[i]), int(candidate[i+1]), int(address.number) )
-#                         if addr_score:
-#                             if i==12: side_flag='L'
-#                             else: side_flag='R'
-#                     except:
-#                         pass #Just pass for now aka TODO
-#                     i+=2
-#             score += addr_score
-#             candidate_list.append(candidate + [score] + [side_flag] )
-#
-#         # Sort list by score
-#         candidate_list.sort(key=lambda x: x[17], reverse=True)
-#         if len(candidate_list) >= 5:
-#             return candidate_list[:4]
-#         else:
-#             return candidate_list
+    city_candidates.sort(key=lambda x: x.score, reverse=True)
+    return city_candidates
