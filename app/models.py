@@ -26,4 +26,4 @@ class Place(Base):
         self.score = 0
 
     def __str__(self):
-        return '[id: %s, zip: %s, city: %s, state: %s, rank: %s]' % (self.id, self.zip, self.city, self.state, self.rank)
+        return '[id: %s, zip: %s, city: %s, state: %s, rank: %s]' % (self.id, self.zip, self.city, self.state, self.score)

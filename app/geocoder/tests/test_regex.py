@@ -16,6 +16,3 @@ class TestRegex(unittest.TestCase):
             assert self.regex.cannonical_street_types[address_tokens[-1]] == 'DR'
         else:
             assert False
-
-if __name__ == '__main__':
-    TestRegex()
