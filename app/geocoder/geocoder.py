@@ -2,7 +2,7 @@ __author__ = 'Tauren'
 
 import logging
 from app import db
-from app.models import Place
+from app.models import Place, AddrFeat
 from .address import Address
 from .parser import AddressParser
 from .metaphone import meta
@@ -19,11 +19,12 @@ class Geocoder:
 
     def geocode(self, address_string):
         address = self.address_parser.parse_address_string(Address(address_string))
-
+        print('Geocoding Address: %s' % address)
         # Currently Address Line 1 could be city or an actualy address line
         results = []
         if address.address_line_1:
-            pass
+            results = self.geocode_address(address)
+            print('res: %s' % results)
 
         if len(results) == 0 and address.address_line_1:
             address.city = address.address_line_1
@@ -49,27 +50,59 @@ class Geocoder:
             return []
 
     def geocode_address(self, address):
-        pass
+
+        addr_feats = []
+        place_candidates = self.geocode_city(address)
+
+        if len(place_candidates) == 0:
+            return []
+
+        if place_candidates and address.city == None:
+            for place_candidate in place_candidates:
+                if place_candidate.city in address.address_line_1:
+                    logger.info("")
+                    address.city = place_candidate.city
+                    address.address_line_1.replace(address.city, '')
+
+        # Todo; tokenize address line string
+        zips = [place.zip for place in place_candidates]
+        addr_candidates = self.addrfeat_by_street_and_zips(address.address_line_1, zips)
+
+        return addr_feats
+
+    def addrfeat_by_street_and_zips(self, street_name, zipcodes):
+        filters = [AddrFeat.fullname == street_name]
+
+        # Todo add in dmetaphone
+        if zipcodes:
+            filters.append([AddrFeat.zipl.in_(zipcodes)])
+            filters.append([AddrFeat.zipr.in_(zipcodes)])
+
+        results = db.session.query(AddrFeat).filter(*filters).all()
+        logger.info("")
+        return results
+
 
     def places_by_zip(self, zipcode):
         results = db.session.query(Place).filter(Place.zip == zipcode).all()
         logger.info("places_by_zip for zip %s. results count: %s" % (zipcode, len(results)))
         return results
 
+
     def places_by_city(self, city, state_code=None, zip=None):
         # Todo; Should tokenize city into possible permutations
         primary, secondary = self.metaphone.process(city)
 
-        queries = [Place.city_metaphone.in_([primary, secondary])]
-
+        filters = [Place.city_metaphone.in_([primary, secondary])]
         if state_code:
-            queries.append(Place.state_code == state_code)
+            filters.append(Place.state_code == state_code)
 
         if zip:
-            queries.append(Place.zip == zip)
+            filters.append(Place.zip == zip)
 
-        results = db.session.query(Place).filter(*queries).all()
+        results = db.session.query(Place).filter(*filters).all()
         logger.info("Places_by_city for city %s (DM: %s) results count: %s." % (city, primary, len(results)))
         return results
+
 
 

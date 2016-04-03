@@ -91,3 +91,5 @@ class TestGeocodeAddress(TestCase):
     def test_geocoding_basic_addresses(self):
         address = '6 Caputo Drive Manorville NY 11949'
         data = self.geocoder.geocode(address)
+        for d in data:
+            print(d)

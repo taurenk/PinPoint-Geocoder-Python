@@ -27,3 +27,24 @@ class Place(Base):
 
     def __str__(self):
         return '[id: %s, zip: %s, city: %s, state: %s, rank: %s]' % (self.id, self.zip, self.city, self.state, self.score)
+
+
+class AddrFeat(Base):
+
+    __tablename__ = 'addrfeat'
+
+    gid = Column(Integer, primary_key=True)
+    tlid = Column(Integer)
+    fullname = Column(String(100))
+    # Left/Right street data
+    lfromhn = Column(String(12))
+    ltohn = Column(String(12))
+    rfromhn = Column(String(12))
+    rtohn = Column(String(12))
+    zipl = Column(String(5))
+    zipr = Column(String(5))
+    geom = Column(Geometry('MULTILINESTRING'))
+
+    @orm.reconstructor
+    def init_on_load(self):
+        self.score = 0

@@ -1,3 +1,7 @@
+"""
+SOURCE: TODO; link github code snippet
+"""
+
 class meta:
     length = 0
 
