@@ -1,5 +1,6 @@
 language: python
 python:
-  - "3.5"
-install: "pip install -r requirements.txt"
-script: nosetests
+  - '3.5'
+install: 'pip install -r requirements.txt'
+script:
+  - 'python -m unittest discover project_directory "*_test.py"'
