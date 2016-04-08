@@ -31,5 +31,24 @@ Pulls city data from the place table provided by Geonames.org
 /api/v1.0/addressfeatures/<string:street_fullname>
 Pulls street level data from US Census AddrFeat table
 
-
+### JSON Sample
+{
+    "candidate_index": 0,
+    "formatted_address" : "1 Elm St, Tuckahoe, NY 10707, USA",
+    "components": {
+        "primary_number": "1",
+        "street_name": "Elm",
+        "street_suffix": "St",
+        "city_name": "Tuckahoe",
+        "state_abbreviation": "NY",
+        "zipcode": "10707",
+        "plus4_code": "3925"
+    },
+    "geometry" : {
+        "location" : {
+            "lat" : 40.9511263,
+            "lng" : -73.8307976
+        }
+    }
+}
 

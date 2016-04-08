@@ -49,6 +49,30 @@ class TestPlacesByZip(TestCase):
         assert len(cities) == 0
 
 
+class TestAddrfeatByStreetFuzzy(TestCase):
+
+    def create_app(self):
+        app = Flask(__name__)
+        app.config.from_object('config')
+        db.init_app(app)
+        app.db = db
+        return app
+
+    def setUp(self):
+        self.geocoder = Geocoder()
+
+    def test_addrfeats_fuzzy_with_results(self):
+        results = self.geocoder.addrfeat_by_street_and_zips_fuzzy('Caputo Dr', ['11949', '11934'])
+        print('X: %s' % (results[0].__dict__.keys()))
+        assert len(results) == 1
+
+    def test_places_by_city_with_no_results(self):
+        cities = self.geocoder.places_by_city('RETURNS NOTHING')
+        assert len(cities) == 0
+
+
+
+
 class TestGeocodeCity(TestCase):
     def setUp(self):
         self.geocoder = Geocoder()

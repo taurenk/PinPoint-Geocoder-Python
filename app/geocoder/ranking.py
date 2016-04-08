@@ -1,5 +1,6 @@
 __author__ = 'Tauren'
 
+from Levenshtein import distance
 
 def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
 
@@ -17,4 +18,13 @@ def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
 
 
 def rank_address_candidates(street, city, zip, addrfeat_candidates):
-    pass
+
+    for candidate in addrfeat_candidates:
+
+        if street.title() == candidate.fullname.title():
+            candidate.score += 2
+
+        ## TODO
+
+    addrfeat_candidates.sort(key=lambda x: x.score, reverse=True)
+    return addrfeat_candidates

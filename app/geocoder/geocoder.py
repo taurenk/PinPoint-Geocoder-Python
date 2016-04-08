@@ -2,11 +2,12 @@ __author__ = 'Tauren'
 
 import logging
 from app import db
-from app.models import Place, AddrFeat
+from app.models import Place, AddrFeat, AddressResult
 from .address import Address
 from .parser import AddressParser
 from .metaphone import meta
-from .ranking import rank_city_candidates
+from .ranking import rank_city_candidates, rank_address_candidates
+from sqlalchemy import text
 
 logger = logging.getLogger('geocoder')
 
@@ -24,9 +25,10 @@ class Geocoder:
         results = []
         if address.address_line_1:
             results = self.geocode_address(address)
-            print('res: %s' % results)
+            print('geocode address res: %s' % results)
 
         if len(results) == 0 and address.address_line_1:
+            print('Found 0 results, geocoding city')
             address.city = address.address_line_1
             address.address_line_1 = None
             results = self.geocode_city(address)
@@ -50,26 +52,30 @@ class Geocoder:
             return []
 
     def geocode_address(self, address):
+        logger.info("Geocoding address for address %s" % address)
 
-        addr_feats = []
         place_candidates = self.geocode_city(address)
 
         if len(place_candidates) == 0:
             return []
 
+        # Match State OR Zip
         if place_candidates and address.city == None:
             for place_candidate in place_candidates:
                 if place_candidate.city in address.address_line_1:
-                    logger.info("")
                     address.city = place_candidate.city
-                    address.address_line_1.replace(address.city, '')
+                    address.address_line_1 = address.address_line_1.replace(address.city, '').strip()
 
+        print("Address Now: %s" % address)
         # Todo; tokenize address line string
         zips = [place.zip for place in place_candidates]
         addr_candidates = self.addrfeat_by_street_and_zips(address.address_line_1, zips)
         for a in addr_candidates:
             print("AC: %s" % a)
-        return addr_feats
+
+        results = [AddressResult(0, address.address_string, None, addr.fullname, 'PLACEHOLDER', 'PLACEHOLDER', addr.zipl)
+                   for addr in addr_candidates]
+        return results
 
     def addrfeat_by_street_and_zips(self, street_name, zipcodes):
         primary, secondary = self.metaphone.process(street_name)
@@ -81,6 +87,18 @@ class Geocoder:
 
         results = db.session.query(AddrFeat).filter(*filters).all()
         logger.info("addrfeat_by_street_and_zips for street_name '%s' and zips '%s' results: %s" % (street_name, zipcodes, len(results)))
+        return results
+
+    def addrfeat_by_street_and_zips_fuzzy(self, street_name, zipcodes):
+        filters = [text("levenshtein(fullname, '%s') <= 3" % (street_name))]
+
+        if zipcodes:
+            filters.append(AddrFeat.zipl.in_(zipcodes))
+            filters.append(AddrFeat.zipr.in_(zipcodes))
+
+        results = db.session.query(AddrFeat).filter(*filters).all()
+
+        logger.info("addrfeat_by_street_and_zips_fuzzy for street_name '%s' and zips '%s' results: %s" % (street_name, zipcodes, len(results)))
         return results
 
     def places_by_zip(self, zipcode):
@@ -103,5 +121,5 @@ class Geocoder:
         logger.info("Places_by_city for city %s (DM: %s) results count: %s." % (city, primary, len(results)))
         return results
 
-
-
+    def match_city(self, address, city_candidates):
+        pass

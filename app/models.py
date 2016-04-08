@@ -3,11 +3,13 @@ __author__ = 'Tauren'
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Numeric, Integer, String, orm
 from geoalchemy2 import Geometry
+from collections import defaultdict
+
 
 Base = declarative_base()
 
-class Place(Base):
 
+class Place(Base):
     __tablename__ = 'place'
 
     id = Column(Integer, primary_key=True)
@@ -26,11 +28,11 @@ class Place(Base):
         self.score = 0
 
     def __str__(self):
-        return '[id: %s, zip: %s, city: %s, state: %s, rank: %s]' % (self.id, self.zip, self.city, self.state, self.score)
+        return '[id: %s, zip: %s, city: %s, state: %s, rank: %s]' % (
+        self.id, self.zip, self.city, self.state, self.score)
 
 
 class AddrFeat(Base):
-
     __tablename__ = 'addrfeat'
 
     gid = Column(Integer, primary_key=True)
@@ -51,5 +53,45 @@ class AddrFeat(Base):
         self.score = 0
 
     def __str__(self):
-        return '[id: %s, fullname: %s, meta: %s, zipl: %s, zipr: %s]' % (
-            self.tlid, self.fullname, self.fullname_metaphone, self.zipl, self.zipr)
+        return '[id: %s, fullname: %s, zipl: %s, zipr: %s]' % (
+            self.tlid, self.fullname, self.zipl, self.zipr)
+
+
+class AddressResult:
+
+    def __init__(self, candidate_index, formatted_address,
+                 primary_number, street_fullname, city_name, state_abbreviation, zipcode,
+                 lat=None, lon=None):
+
+        self.candidate_index = candidate_index
+        self.formatted_address = formatted_address
+
+        self.primary_number = primary_number
+        self.street_fullname = street_fullname
+        self.city_name = city_name
+        self.state_abbreviation = state_abbreviation
+        self.zipcode = zipcode
+
+        self.lat = lat
+        self.lon = lon
+
+    def to_dict(self):
+
+        output = {
+            "candidate_index": self.candidate_index,
+            "formatted_address": self.formatted_address,
+            "components": {
+                "primary_number": self.primary_number,
+                "street_fullname": self.street_fullname,
+                "city_name": self.city_name,
+                "state": self.state_abbreviation,
+                "zipcode": self.zipcode
+            },
+            "geometry": {
+                "location": {
+                    "lat": self.lat,
+                    "lon": self.lon
+                }
+            }
+        }
+        return output
