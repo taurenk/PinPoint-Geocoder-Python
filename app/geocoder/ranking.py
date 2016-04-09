@@ -17,14 +17,21 @@ def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
     return city_candidates
 
 
-def rank_address_candidates(street, city, state_abbrevation, zip, addrfeat_candidates, place_candidates):
+def rank_address_results(street, city, state_abbrevation, zip, address_results_candidates):
 
-    for candidate in addrfeat_candidates:
-
-        if street.title() == candidate.fullname.title():
+    for candidate in address_results_candidates:
+        print("Rank Candidate: %s" % (candidate.street_fullname))
+        if street == candidate.street_fullname:
             candidate.score += 2
 
-        ## TODO
+        if city == candidate.city_name:
+            candidate.score += 1
 
-    addrfeat_candidates.sort(key=lambda x: x.score, reverse=True)
-    return addrfeat_candidates
+        if state_abbrevation == candidate.state_abbreviation:
+            candidate.score += 1
+
+        if zip == candidate.zipcode:
+            candidate.score += 1
+
+    address_results_candidates.sort(key=lambda x: x.score, reverse=True)
+    return address_results_candidates

@@ -59,10 +59,11 @@ class AddrFeat(Base):
 
 class AddressResult:
 
-    def __init__(self, formatted_address, score, level,
+    def __init__(self, formatted_address, level, score=0,
                  primary_number=None, street_fullname=None,
                  city_name=None, state_abbreviation=None, zipcode=None,
                  lat=None, lon=None):
+
 
         self.score = score
         self.level = level
@@ -76,6 +77,10 @@ class AddressResult:
 
         self.lat = lat
         self.lon = lon
+
+    def __str__(self):
+        string = "<street: %s, city: %s, state: %s, zip: %s>" % (self.street_fullname, self.city_name, self.state_abbreviation, self.zipcode)
+        return string
 
     def to_dict(self):
 
