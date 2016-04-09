@@ -59,11 +59,13 @@ class AddrFeat(Base):
 
 class AddressResult:
 
-    def __init__(self, candidate_index, formatted_address,
-                 primary_number, street_fullname, city_name, state_abbreviation, zipcode,
+    def __init__(self, formatted_address, score, level,
+                 primary_number=None, street_fullname=None,
+                 city_name=None, state_abbreviation=None, zipcode=None,
                  lat=None, lon=None):
 
-        self.candidate_index = candidate_index
+        self.score = score
+        self.level = level
         self.formatted_address = formatted_address
 
         self.primary_number = primary_number
@@ -78,20 +80,25 @@ class AddressResult:
     def to_dict(self):
 
         output = {
-            "candidate_index": self.candidate_index,
+            "score": self.score,
+            "level": self.level,
             "formatted_address": self.formatted_address,
+            "geometry": {
+                "location": {
+                    "lat": str(self.lat),
+                    "lon": str(self.lon)
+                }
+            },
             "components": {
-                "primary_number": self.primary_number,
-                "street_fullname": self.street_fullname,
                 "city_name": self.city_name,
                 "state": self.state_abbreviation,
                 "zipcode": self.zipcode
-            },
-            "geometry": {
-                "location": {
-                    "lat": self.lat,
-                    "lon": self.lon
-                }
             }
         }
+
+        if self.primary_number:
+            output["components"]["primary_number"] = self.primary_number
+        if self.street_fullname:
+            output["components"]["street_fullname"] = self.street_fullname
+
         return output

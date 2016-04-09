@@ -1,11 +1,11 @@
 __author__ = 'Tauren'
 
+from app.models import AddressResult
 from Levenshtein import distance
 
 def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
 
     for candidate in city_candidates:
-
         if addr_city and addr_city.title() == candidate.city:
             candidate.score += 2
         if addr_state == candidate.state_code:
@@ -17,7 +17,7 @@ def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
     return city_candidates
 
 
-def rank_address_candidates(street, city, zip, addrfeat_candidates):
+def rank_address_candidates(street, city, state_abbrevation, zip, addrfeat_candidates, place_candidates):
 
     for candidate in addrfeat_candidates:
 
