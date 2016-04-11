@@ -40,11 +40,14 @@ class Geocoder:
         address, places = self.find_city(address)
 
         if (address.address_line_1 == None or address.address_line_1 == '') and address.city:
-            logger.info("Extracted city from address line, no street left.")
+            logger.info("Extracted city from address line. Not Street left.")
             return []
 
         zips = [place.zip for place in places]
         addr_candidates = self.addrfeat_by_street_and_zips(address.address_line_1, zips)
+
+        if addr_candidates == []:
+            addr_candidates = self.addrfeat_by_street_and_zips_fuzzy(address.address_line_1, zips)
 
         results = [self.build_address_result(address, addrfeat, places)
                    for addrfeat in addr_candidates]
@@ -55,7 +58,6 @@ class Geocoder:
     def geocode_city(self, address):
         logger.info("Geocoding city for address %s" % address)
         print("Geocoding city for address %s" % address)
-
 
         address, places = self.find_city(address)
 
