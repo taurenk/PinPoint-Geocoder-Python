@@ -32,6 +32,12 @@ class Geocoder:
                 address.address_line_1 = None
             results = self.geocode_city(address)
 
+        logger.info("Found %s Results." % len(results))
+
+        for idx, result in enumerate(results):
+            if idx <= 3:
+                logger.info("#%s - %s " % (idx, result))
+
         return results
 
     def geocode_address(self, address):
@@ -57,7 +63,6 @@ class Geocoder:
 
     def geocode_city(self, address):
         logger.info("Geocoding city for address %s" % address)
-        print("Geocoding city for address %s" % address)
 
         address, places = self.find_city(address)
 
@@ -151,14 +156,15 @@ class Geocoder:
             filters.append(Place.zip == zip)
 
         results = db.session.query(Place).filter(*filters).all()
-        print("RESULTS:  " % results)
         logger.info("Places_by_city for city %s (DM: %s) results count: %s." % (city_strings, metaphones, len(results)))
         return results
 
     def build_address_result(self, address, addrfeat, place_candidates):
 
-        address_result = AddressResult(address.original_address_string, "street", 0,
-                                       address.number, addrfeat.fullname)
+        address_result = AddressResult(address.original_address_string, "street", score=0,
+                                       primary_number=address.number, street_fullname=addrfeat.fullname)
+        address_result.tlid = str(addrfeat.tlid)
+
         for place in place_candidates:
             if place.zip == addrfeat.zipr or place.zip == addrfeat.zipl:
                 address_result.zipcode = place.zip
