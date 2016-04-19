@@ -15,7 +15,7 @@ def convert_geom_to_points(geom):
     data = data.replace('MULTILINESTRING ((', '')
     data = data.replace('))', '')
     point_list = data.split(',')
-    points = [p.split(' ') for p in point_list]
+    points = [p.strip().split(' ') for p in point_list]
     return points
 
 

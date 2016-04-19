@@ -8,7 +8,7 @@ from .parser import AddressParser
 from .metaphone import meta
 from .ranking import rank_city_candidates, rank_address_results
 from sqlalchemy import text
-
+from .utils.geo_utils import convert_geom_to_points
 logger = logging.getLogger('geocoder')
 
 
@@ -33,11 +33,6 @@ class Geocoder:
             results = self.geocode_city(address)
 
         logger.info("Found %s Results." % len(results))
-
-        for idx, result in enumerate(results):
-            if idx <= 3:
-                logger.info("#%s - %s " % (idx, result))
-
         return results
 
     def geocode_address(self, address):
@@ -59,6 +54,9 @@ class Geocoder:
                    for addrfeat in addr_candidates]
 
         results = rank_address_results(address.address_line_1, address.city, address.state, address.zip, results)
+
+        for i in range(3):
+            logger.info("Address Result: #%s - %s " % (i, results[0]))
         return results
 
     def geocode_city(self, address):
@@ -163,6 +161,8 @@ class Geocoder:
 
         address_result = AddressResult(address.original_address_string, "street", score=0,
                                        primary_number=address.number, street_fullname=addrfeat.fullname)
+
+        address_result.addrfeat_record = addrfeat
         address_result.tlid = str(addrfeat.tlid)
 
         for place in place_candidates:

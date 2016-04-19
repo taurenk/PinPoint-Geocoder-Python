@@ -20,7 +20,6 @@ def rank_city_candidates(addr_city, addr_state, addr_zip, city_candidates):
 def rank_address_results(street, city, state_abbrevation, zip, address_results_candidates):
 
     for candidate in address_results_candidates:
-        print("Rank Candidate: %s" % (candidate.street_fullname))
         if street == candidate.street_fullname:
             candidate.score += 2
 

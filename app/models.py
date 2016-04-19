@@ -62,8 +62,7 @@ class AddressResult:
     def __init__(self, formatted_address, level, score=0,
                  primary_number=None, street_fullname=None,
                  city_name=None, state_abbreviation=None, zipcode=None,
-                 lat=None, lon=None, tlid=None):
-
+                 lat=None, lon=None, tlid=None, addrfeat_record=None):
 
         self.score = score
         self.level = level
@@ -78,6 +77,7 @@ class AddressResult:
         self.lat = lat
         self.lon = lon
         self.tlid = tlid
+        self.addrfeat_record = addrfeat_record
 
     def __str__(self):
         string = "<street: %s, city: %s, state: %s, zip: %s>" % (self.street_fullname, self.city_name, self.state_abbreviation, self.zipcode)
