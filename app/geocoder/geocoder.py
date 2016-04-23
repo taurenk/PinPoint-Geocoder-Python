@@ -26,6 +26,9 @@ class Geocoder:
         if address.address_line_1:
             results = self.geocode_address(address)
 
+        if results == []:
+            results = self.geocode_city(address)
+
         logger.info("Found %s Results." % len(results))
         return results
 
@@ -61,16 +64,16 @@ class Geocoder:
     def geocode_city(self, address):
         logger.info("Geocoding city for address %s" % address)
 
-        address, places = self.find_city(address)
+        place_candidates = self._find_city_candidates(address.address_line_1, address.city, address.zip)
+        new_street_string, found_city = self._extract_city_from_street(address.address_line_1, place_candidates)
 
-        if places:
-            ranked_places = rank_city_candidates(address.city, address.state, address.zip, places)
-            results = [AddressResult(address.original_address_string, "city", place.score,
-                                     None, None, place.city, place.state_code, place.zip,
-                                     lat=place.latitude, lon=place.longitude) for place in ranked_places]
-            return [result for result in results if result.score > 0]
-        else:
-            return []
+        if new_street_string and found_city:
+            address.address_line_1 = new_street_string
+            address.city = found_city
+
+        ranked_places = rank_city_candidates(address.city, address.state, address.zip, place_candidates)
+        results = [AddressResult(address.address_string,None,None,place,None) for place in ranked_places]
+        return results
 
     def _find_city_candidates(self, street, city, zip):
         logger.info("Searching for City in Address <%s, %s, %s>" % (street, city, zip))

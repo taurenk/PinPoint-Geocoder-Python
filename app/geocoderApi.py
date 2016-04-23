@@ -10,4 +10,7 @@ geocoder = Geocoder()
 class GeocoderApi(Resource):
     def get(self, address_string):
         results = geocoder.geocode(address_string)
-        return {'results': [res.to_dict() for res in results]}, 200
+        if len(results) == 0:
+            return {'results': []}, 200
+        else:
+            return {'results': [res.to_dict() for res in results]}, 200

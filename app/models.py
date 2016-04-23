@@ -81,12 +81,7 @@ class AddressResult:
         output = {
             "score": self.score,
             "original_address": self.original_string,
-            "geometry": {
-                "location": {
-                    "lat": str(self.lat),
-                    "lon": str(self.lon)
-                }
-            },
+            "geometry": {},
             "components": {}
         }
 
@@ -101,5 +96,10 @@ class AddressResult:
             output["components"]["city"] = self.place.city
             output["components"]["state"] = self.place.state_code
             output["components"]["zipcode"] = self.place.zip
+
+        if self.lat and self.lon:
+            output["geometry"]["location"] = {"lat": str(self.lat), "lon": str(self.lon)}
+        elif self.place:
+            output["geometry"]["location"] = {"lat": str(self.place.latitude), "lon": str(self.place.longitude)}
 
         return output
