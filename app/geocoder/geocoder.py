@@ -18,19 +18,13 @@ class Geocoder:
         self.address_parser = AddressParser()
 
     def geocode(self, address_string):
+
         address = self.address_parser.parse_address_string(Address(address_string))
         logger.info("Geocoding: %s" % address)
-        print('Geocoding: %s' % address)
 
         results = []
         if address.address_line_1:
             results = self.geocode_address(address)
-
-        if len(results) == 0:
-            if address.city == None:
-                address.city = address.address_line_1
-                address.address_line_1 = None
-            results = self.geocode_city(address)
 
         logger.info("Found %s Results." % len(results))
         return results
@@ -38,25 +32,30 @@ class Geocoder:
     def geocode_address(self, address):
         logger.info("Geocode Address %s" % address)
 
-        address, places = self.find_city(address)
+        # We will never initially parse a city from a street
+        place_candidates = self._find_city_candidates(address.address_line_1, address.city, address.zip)
+        new_street_string, found_city = self._extract_city_from_street(address.address_line_1, place_candidates)
 
-        if (address.address_line_1 == None or address.address_line_1 == '') and address.city:
-            logger.info("Extracted city from address line. Not Street left.")
+        if new_street_string and found_city:
+            address.address_line_1 = new_street_string
+            address.city = found_city
+
+        if (address.address_line_1 == None or address.address_line_1 == ''):
+            logger.info("No Street Found in Address.")
             return []
 
-        zips = [place.zip for place in places]
+        zips = [place.zip for place in place_candidates]
+
+        address.address_line_1 = self.address_parser.standardize_street_string(address.address_line_1)
         addr_candidates = self.addrfeat_by_street_and_zips(address.address_line_1, zips)
 
         if addr_candidates == []:
             addr_candidates = self.addrfeat_by_street_and_zips_fuzzy(address.address_line_1, zips)
 
-        results = [self.build_address_result(address, addrfeat, places)
+        results = [self.build_address_result(address, addrfeat, place_candidates)
                    for addrfeat in addr_candidates]
 
-        results = rank_address_results(address.address_line_1, address.city, address.state, address.zip, results)
-
-        for i in range(3):
-            logger.info("Address Result: #%s - %s " % (i, results[0]))
+        # results = rank_address_results(address.address_line_1, address.city, address.state, address.zip, results)
         return results
 
     def geocode_city(self, address):
@@ -73,39 +72,37 @@ class Geocoder:
         else:
             return []
 
-    def find_city(self, address):
+    def _find_city_candidates(self, street, city, zip):
+        logger.info("Searching for City in Address <%s, %s, %s>" % (street, city, zip))
         places = []
-        if address.zip:
-            places = self.places_by_zip(address.zip)
 
-        if address.address_line_1:
-            address_tokens = self.tokenize_street(address.address_line_1)
-            places += self.places_by_city(address_tokens)
-        elif address.city:
-            places += self.places_by_city([address.city])
+        #if street:
+        #    address_tokens = self._tokenize_street(street)
+        #    places += self.places_by_city(address_tokens)
+        if city:
+            places += self.places_by_city([city])
+        if zip:
+            places += self.places_by_zip(zip)
 
-        if places and address.city == None:
-            address = self.extract_city(address, places)
+        return places
 
-        return address, places
+    def _extract_city_from_street(self, street, place_candidates):
+        logger.info("place_candidates to Extract City From Street: %s" % street)
+        for place in place_candidates:
+            if place.city in street:
+                logger.info("Extracted city '%s' from address line 1 '%s'" % (place.city, street))
+                new_street_string = street.replace(place.city, '').strip()
+                return new_street_string, place.city
+        return None, None
 
-    def extract_city(self, address, places):
-        logger.info("Extracting City From Address: %s" % address)
-        for place in places:
-            if place.city in address.address_line_1:
-                logger.info("Extracted city '%s' from address line 1 '%s'" % (place.city ,address.address_line_1 ))
-                address.city = place.city
-                address.address_line_1 = address.address_line_1.replace(address.city, '').strip()
-
-        return address
-
-    def tokenize_street(self, address_line):
+    def _tokenize_street(self, address_line):
         street_tokens = [address_line]
 
         if address_line.count(" ") > 0:
             tokens = address_line.split(" ")
             street_tokens.append(tokens[-1])
             street_tokens.append(tokens[-2] + " " + tokens[-1])
+        print(street_tokens)
         return street_tokens
 
     def addrfeat_by_street_and_zips(self, street_name, zipcodes):
@@ -158,17 +155,7 @@ class Geocoder:
         return results
 
     def build_address_result(self, address, addrfeat, place_candidates):
-
-        address_result = AddressResult(address.original_address_string, "street", score=0,
-                                       primary_number=address.number, street_fullname=addrfeat.fullname)
-
-        address_result.addrfeat_record = addrfeat
-        address_result.tlid = str(addrfeat.tlid)
-
         for place in place_candidates:
             if place.zip == addrfeat.zipr or place.zip == addrfeat.zipl:
-                address_result.zipcode = place.zip
-                address_result.city_name = place.city
-                address_result.state_abbreviation = place.state_code
-        return address_result
+                return AddressResult(address.original_address_string,address.number,addrfeat,place)
 

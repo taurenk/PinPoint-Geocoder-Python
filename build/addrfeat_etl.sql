@@ -7,7 +7,7 @@ ALTER TABLE addrfeat_staging
 	ADD fullname_metaphone VARCHAR(10);
 
 UPDATE addrfeat_staging
-	SET fullname_metaphone = dmetaphone(fullname_metaphone);
+	SET fullname_metaphone = dmetaphone(fullname);
 
 DROP TABLE addrfeat;
 ALTER TABLE addrfeat_staging

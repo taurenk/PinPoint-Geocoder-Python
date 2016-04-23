@@ -59,54 +59,47 @@ class AddrFeat(Base):
 
 class AddressResult:
 
-    def __init__(self, formatted_address, level, score=0,
-                 primary_number=None, street_fullname=None,
-                 city_name=None, state_abbreviation=None, zipcode=None,
-                 lat=None, lon=None, tlid=None, addrfeat_record=None):
+    def __init__(self,
+                 original_string,
+                 primary_number=None,
+                 addr_feat=None, place_record=None, score=None):
 
-        self.score = score
-        self.level = level
-        self.formatted_address = formatted_address
-
+        self.original_string = original_string
         self.primary_number = primary_number
-        self.street_fullname = street_fullname
-        self.city_name = city_name
-        self.state_abbreviation = state_abbreviation
-        self.zipcode = zipcode
-
-        self.lat = lat
-        self.lon = lon
-        self.tlid = tlid
-        self.addrfeat_record = addrfeat_record
+        self.addr_feat = addr_feat
+        self.place = place_record
+        self.score = score
+        self.lat = None
+        self.lon = None
 
     def __str__(self):
-        string = "<street: %s, city: %s, state: %s, zip: %s>" % (self.street_fullname, self.city_name, self.state_abbreviation, self.zipcode)
+        string = "<street: %s, city: %s, state: %s, zip: %s>" % (self.street, self.city, self.state, self.zip)
         return string
 
     def to_dict(self):
 
         output = {
             "score": self.score,
-            "level": self.level,
-            "formatted_address": self.formatted_address,
+            "original_address": self.original_string,
             "geometry": {
                 "location": {
                     "lat": str(self.lat),
                     "lon": str(self.lon)
                 }
             },
-            "components": {
-                "city_name": self.city_name,
-                "state": self.state_abbreviation,
-                "zipcode": self.zipcode
-            }
+            "components": {}
         }
 
         if self.primary_number:
             output["components"]["primary_number"] = self.primary_number
-        if self.street_fullname:
-            output["components"]["street_fullname"] = self.street_fullname
-        if self.tlid:
-            output["tiger_line_id"] = self.tlid
+
+        if self.addr_feat:
+            output["components"]["street_fullname"] = self.addr_feat.fullname
+            output["tiger_line_id"] = str(self.addr_feat.tlid)
+
+        if self.place:
+            output["components"]["city"] = self.place.city
+            output["components"]["state"] = self.place.state_code
+            output["components"]["zipcode"] = self.place.zip
 
         return output

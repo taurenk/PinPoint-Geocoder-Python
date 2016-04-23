@@ -40,18 +40,14 @@ class AddressParser:
         address.address_line_1 = address_string.title().strip()
         return address
 
-    def post_parse_address(self, address):
-        """
-        :param address:
-        :return: address object
-        """
+    def standardize_street_string(self, street_string):
         # Crudely standardize address
-        street_tokens = address.address_line_1.split(' ')
+        street_tokens = street_string.split(' ')
 
         # Take first value in street and see if we can standardize it.
-        if street_tokens[-1] in self.regex.cannonical_street_types:
+        if street_tokens[-1].upper() in self.regex.cannonical_street_types:
             # swap value to standard abbreviation
-            street_tokens[-1] = self.regex.cannonical_street_types[street_tokens[-1]]
+            street_tokens[-1] = self.regex.cannonical_street_types[street_tokens[-1].upper()]
 
-        address.address_line_1 = ' '.join(street_tokens)
-        return address
+        new_street_string = ' '.join(street_tokens)
+        return new_street_string.title()
