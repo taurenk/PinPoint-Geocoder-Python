@@ -12,3 +12,8 @@ UPDATE addrfeat_staging
 DROP TABLE addrfeat;
 ALTER TABLE addrfeat_staging
 	RENAME TO addrfeat;
+
+
+CREATE INDEX ON addrfeat (zipl);
+CREATE INDEX ON addrfeat (zipr);
+CREATE INDEX ON addrfeat (fullname_metaphone);
