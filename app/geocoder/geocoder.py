@@ -8,7 +8,7 @@ from .parser import AddressParser
 from .metaphone import meta
 from .ranking import rank_city_candidates, rank_address_results
 from sqlalchemy import text
-from .utils.geo_utils import convert_geom_to_points
+
 logger = logging.getLogger('geocoder')
 
 
@@ -79,6 +79,7 @@ class Geocoder:
         logger.info("Searching for City in Address <%s, %s, %s>" % (street, city, zip))
         places = []
 
+        # TODO; the street tokens are too generic and yield way too many results
         #if street:
         #    address_tokens = self._tokenize_street(street)
         #    places += self.places_by_city(address_tokens)
@@ -152,7 +153,6 @@ class Geocoder:
             filters.append(Place.state_code == state_code)
         if zip:
             filters.append(Place.zip == zip)
-
         results = db.session.query(Place).filter(*filters).all()
         logger.info("Places_by_city for city %s (DM: %s) results count: %s." % (city_strings, metaphones, len(results)))
         return results

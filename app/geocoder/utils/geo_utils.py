@@ -18,7 +18,6 @@ def convert_geom_to_points(geom):
     points = [p.strip().split(' ') for p in point_list]
     return points
 
-
 def convert_strings_to_float(from_num, to_num, target_num):
     # print('->Converting a string <%s/%s/%s> to float: %s' % (from_num, to_num, target_num, err))
     try:
