@@ -3,6 +3,7 @@ __author__ = 'Tauren'
 from flask import Flask
 from flask.ext.restful import Api
 from flask.ext.sqlalchemy import SQLAlchemy
+import logging
 
 db = SQLAlchemy()
 

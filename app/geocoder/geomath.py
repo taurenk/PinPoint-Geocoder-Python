@@ -44,9 +44,9 @@ class GeoMath:
         new_lon = (new_lon+3*pi) % (2*pi) - pi #normalize...
         return [degrees(new_lat), degrees(new_lon)]
 
-    def interpolate(self, points_list, target_number,
-                    left_from_house_number, left_to_house_number,
-                    right_from_house_number, right_to_house_number):
+    def interpolate(self, points_list, target_number, left_from_house_number, left_to_house_number, right_from_house_number, right_to_house_number):
+        """
+        """
 
         from_number, to_number = left_from_house_number, right_to_house_number
 
@@ -60,9 +60,27 @@ class GeoMath:
             to_number = left_to_house_number
 
         dist_dict = {}
+        total_dist = 0
         # TODO Confirm; all records in addrfeat table have atleast 2 points
         for idx in range(len(points_list)-1):
-            dist_dict[idx] = self.haversine(points_list[idx][1], points_list[idx][0],
-                                       points_list[idx+1][1], points_list[idx+1][0])
+            dist_dict[idx] = self.haversine(points_list[idx][1], points_list[idx][0], points_list[idx+1][1], points_list[idx+1][0])
+            total_dist += dist_dict[idx]
 
-        print('Dist dict: %s' % dist_dict)
+        total_steps = 0
+
+        target_hn = float(target_number)
+        ratio = total_dist / ((to_number-from_number)/2)
+        target_dist = ((target_hn - from_number)/2) * ratio
+
+        interpolated_point = None
+        counted_dist = 0
+        for k in dist_dict:
+            counted_dist += dist_dict[k]
+            if counted_dist >= target_dist:
+                delta = counted_dist-target_dist
+                segment_distance = dist_dict[k]-delta
+
+                bearing = self.bearing2(points[k][0], points[k][1], points[k+1][0], points[k+1][1])
+
+                interpolated_point = self.find_point2(points[k][0], points[k][1], bearing, segment_distance)
+                break

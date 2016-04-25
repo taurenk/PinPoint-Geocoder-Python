@@ -4,7 +4,7 @@ import logging
 from app import db
 from app.models import Place, AddrFeat, AddressResult
 from .address import Address
-from .parser import AddressParser
+from .address_parser import AddressParser
 from .metaphone import meta
 from .ranking import rank_city_candidates, rank_address_results
 from sqlalchemy import text

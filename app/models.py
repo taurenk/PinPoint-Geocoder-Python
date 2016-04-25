@@ -3,8 +3,8 @@ __author__ = 'Tauren'
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Numeric, Integer, String, orm
 from geoalchemy2 import Geometry
-from collections import defaultdict
-
+from binascii import unhexlify
+from shapely import wkb, wkt
 
 Base = declarative_base()
 
@@ -39,6 +39,7 @@ class AddrFeat(Base):
     tlid = Column(Integer)
     fullname = Column(String(100))
     fullname_metaphone = Column(String(10))
+
     # Left/Right street data
     lfromhn = Column(String(12))
     ltohn = Column(String(12))
@@ -56,6 +57,18 @@ class AddrFeat(Base):
         return '[id: %s, fullname: %s, zipl: %s, zipr: %s]' % (
             self.tlid, self.fullname, self.zipl, self.zipr)
 
+    def geom_to_points(self):
+        """ Convert binary geom column to list of lat/lon point strings
+        :return: list of lists containing lat/lon as string.
+        """
+        binary = unhexlify(self.geom.desc)
+        point = wkb.loads(binary)
+        data = wkt.dumps(point)
+        data = data.replace('MULTILINESTRING ((', '')
+        data = data.replace('))', '')
+        point_list = data.split(',')
+        points = [p.strip().split(' ') for p in point_list]
+        return points
 
 class AddressResult:
 
