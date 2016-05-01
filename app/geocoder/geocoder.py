@@ -25,6 +25,7 @@ class Geocoder:
         results = []
         if address.address_line_1:
             results = self.geocode_address(address)
+            print("X: %s" % results[0].addr_feat.geom_to_points())
 
         if results == []:
             results = self.geocode_city(address)

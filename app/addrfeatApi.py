@@ -5,6 +5,11 @@ from flask.ext.restful import Resource, marshal, fields
 from .models import AddrFeat
 from app import db
 
+
+class GeomToList(fields.Raw):
+    def format(self, geom):
+        return AddrFeat.geom_to_points(geom)
+
 addrfeat_fields = {
     'gid': fields.Integer,
     'tlid': fields.Integer,
@@ -21,7 +26,8 @@ addrfeat_fields = {
     'name': fields.String,
     'predirabrv': fields.String,
     'pretypabrv': fields.String,
-    'suftypabrv': fields.String
+    'suftypabrv': fields.String,
+    'geom': GeomToList
 }
 
 class AddrfeatApi(Resource):
@@ -29,11 +35,8 @@ class AddrfeatApi(Resource):
     def __int__(self):
         pass
 
-    def get(self, street_name):
-        """ Get city data based on given city
-        :return:
-        """
-        addrfeat_data = db.session.query(AddrFeat).filter(AddrFeat.fullname == street_name).all()
+    def get(self, tlid):
+        addrfeat_data = db.session.query(AddrFeat).filter(AddrFeat.tlid == tlid).all()
         if not addrfeat_data:
             abort(404)
         return {'results': marshal(addrfeat_data, addrfeat_fields)}, 200

@@ -57,18 +57,25 @@ class AddrFeat(Base):
         return '[id: %s, fullname: %s, zipl: %s, zipr: %s]' % (
             self.tlid, self.fullname, self.zipl, self.zipr)
 
-    def geom_to_points(self):
-        """ Convert binary geom column to list of lat/lon point strings
+    @staticmethod
+    def geom_to_points(geom):
+        """
+        Convert binary geom column to list of lat/lon point strings
         :return: list of lists containing lat/lon as string.
         """
-        binary = unhexlify(self.geom.desc)
+        binary = unhexlify(geom.desc)
         point = wkb.loads(binary)
         data = wkt.dumps(point)
         data = data.replace('MULTILINESTRING ((', '')
         data = data.replace('))', '')
         point_list = data.split(',')
         points = [p.strip().split(' ') for p in point_list]
-        return points
+        # point_list = [float(point_list[0]), float(point_list[1])]
+
+        points_to_float_list = [
+            [float(point[0]), float(point[1])] for point in points]
+        return points_to_float_list
+
 
 class AddressResult:
 

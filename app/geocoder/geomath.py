@@ -45,28 +45,22 @@ class GeoMath:
         return [degrees(new_lat), degrees(new_lon)]
 
     def interpolate(self, points_list, target_number, left_from_house_number, left_to_house_number, right_from_house_number, right_to_house_number):
-        """
-        """
 
         from_number, to_number = left_from_house_number, right_to_house_number
 
-        """
-        Let's simplify things for now and only take the highest/lowest numbers.
-        Later, we can add in logic to determine house side
-        """
+        #Let's simplify things for now and only take the highest/lowest numbers.
+        #Later, we can add in logic to determine house side
         if left_from_house_number <= right_from_house_number:
             from_number = left_from_house_number
         if left_to_house_number >= right_to_house_number:
             to_number = left_to_house_number
 
+        # TODO Confirm; all records in addrfeat table have atleast 2 points
         dist_dict = {}
         total_dist = 0
-        # TODO Confirm; all records in addrfeat table have atleast 2 points
         for idx in range(len(points_list)-1):
             dist_dict[idx] = self.haversine(points_list[idx][1], points_list[idx][0], points_list[idx+1][1], points_list[idx+1][0])
             total_dist += dist_dict[idx]
-
-        total_steps = 0
 
         target_hn = float(target_number)
         ratio = total_dist / ((to_number-from_number)/2)
@@ -79,8 +73,7 @@ class GeoMath:
             if counted_dist >= target_dist:
                 delta = counted_dist-target_dist
                 segment_distance = dist_dict[k]-delta
-
-                bearing = self.bearing2(points[k][0], points[k][1], points[k+1][0], points[k+1][1])
-
-                interpolated_point = self.find_point2(points[k][0], points[k][1], bearing, segment_distance)
+                bearing = self.bearing(points_list[k][0], points_list[k][1], points_list[k+1][0], points_list[k+1][1])
+                interpolated_point = self.find_point(points_list[k][0], points_list[k][1], bearing, segment_distance)
                 break
+        return interpolated_point
