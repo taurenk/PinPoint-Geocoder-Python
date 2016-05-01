@@ -7,4 +7,6 @@ script:
   - python3 -m "nose"
   - python3 -m "nose" --with-coverage
 after_success:
-  - 'coveralls debug'
+  - coveralls
+after_failure:
+  - coveralls
