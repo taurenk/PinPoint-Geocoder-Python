@@ -8,3 +8,4 @@ geoalchemy2
 shapely
 python-Levenshtein
 nose
+coveralls
