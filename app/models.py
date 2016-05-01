@@ -70,7 +70,6 @@ class AddrFeat(Base):
         data = data.replace('))', '')
         point_list = data.split(',')
         points = [p.strip().split(' ') for p in point_list]
-        # point_list = [float(point_list[0]), float(point_list[1])]
 
         points_to_float_list = [
             [float(point[0]), float(point[1])] for point in points]

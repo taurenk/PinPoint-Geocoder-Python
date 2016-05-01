@@ -29,4 +29,5 @@ class TestInterpolalation(TestCase):
 
     def test_interpolation_with_from_and_to(self):
         interpolated_point = GeoMath().interpolate(self.points, 6, 0, 100, 1, 99)
-        print("Point: %s " % interpolated_point)
+        assert interpolated_point == [-72.79387938164022, 40.8591068212366]
+

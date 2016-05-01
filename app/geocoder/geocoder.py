@@ -9,8 +9,7 @@ from .metaphone import meta
 from .ranking import rank_city_candidates, rank_address_results
 from sqlalchemy import text
 
-logger = logging.getLogger('geocoder')
-
+logger = logging.getLogger('app')
 
 class Geocoder:
     def __init__(self):
@@ -18,14 +17,13 @@ class Geocoder:
         self.address_parser = AddressParser()
 
     def geocode(self, address_string):
-
         address = self.address_parser.parse_address_string(Address(address_string))
         logger.info("Geocoding: %s" % address)
 
         results = []
         if address.address_line_1:
             results = self.geocode_address(address)
-            print("X: %s" % results[0].addr_feat.geom_to_points())
+            #print("X: %s" % results[0].addr_feat.geom_to_points(self.g))
 
         if results == []:
             results = self.geocode_city(address)
