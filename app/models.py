@@ -118,7 +118,10 @@ class AddressResult:
 
         if self.lat and self.lon:
             output["geometry"]["location"] = {"lat": str(self.lat), "lon": str(self.lon)}
+            output["level"] = "street"
+
         elif self.place:
             output["geometry"]["location"] = {"lat": str(self.place.latitude), "lon": str(self.place.longitude)}
+            output["level"] = "city"
 
         return output

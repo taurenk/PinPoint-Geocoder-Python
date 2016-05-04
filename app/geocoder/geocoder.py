@@ -8,8 +8,10 @@ from .address_parser import AddressParser
 from .metaphone import meta
 from .ranking import rank_city_candidates, rank_address_results
 from sqlalchemy import text
+from .geomath import GeoMath
 
 logger = logging.getLogger('app')
+
 
 class Geocoder:
     def __init__(self):
@@ -23,7 +25,7 @@ class Geocoder:
         results = []
         if address.address_line_1:
             results = self.geocode_address(address)
-            #print("X: %s" % results[0].addr_feat.geom_to_points(self.g))
+            # print("X: %s" % results[0].addr_feat.geom_to_points(self.g))
 
         if results == []:
             results = self.geocode_city(address)
@@ -58,6 +60,8 @@ class Geocoder:
                    for addrfeat in addr_candidates]
 
         # results = rank_address_results(address.address_line_1, address.city, address.state, address.zip, results)
+        self.interpolate_address_results(results)
+
         return results
 
     def geocode_city(self, address):
@@ -71,7 +75,7 @@ class Geocoder:
             address.city = found_city
 
         ranked_places = rank_city_candidates(address.city, address.state, address.zip, place_candidates)
-        results = [AddressResult(address.address_string,None,None,place,None) for place in ranked_places]
+        results = [AddressResult(address.address_string, None, None, place, None) for place in ranked_places]
         return results
 
     def _find_city_candidates(self, street, city, zip):
@@ -79,7 +83,7 @@ class Geocoder:
         places = []
 
         # TODO; the street tokens are too generic and yield way too many results
-        #if street:
+        # if street:
         #    address_tokens = self._tokenize_street(street)
         #    places += self.places_by_city(address_tokens)
         if city:
@@ -118,7 +122,7 @@ class Geocoder:
 
         results = db.session.query(AddrFeat).filter(*filters).all()
         logger.info("addrfeat_by_street_and_zips for street_name '%s' and zips '%s' results: %s" % (
-        street_name, zipcodes, len(results)))
+            street_name, zipcodes, len(results)))
         return results
 
     def addrfeat_by_street_and_zips_fuzzy(self, street_name, zipcodes):
@@ -131,7 +135,7 @@ class Geocoder:
         results = db.session.query(AddrFeat).filter(*filters).all()
 
         logger.info("addrfeat_by_street_and_zips_fuzzy for street_name '%s' and zips '%s' results: %s" % (
-        street_name, zipcodes, len(results)))
+            street_name, zipcodes, len(results)))
         return results
 
     def places_by_zip(self, zipcode):
@@ -159,5 +163,24 @@ class Geocoder:
     def build_address_result(self, address, addrfeat, place_candidates):
         for place in place_candidates:
             if place.zip == addrfeat.zipr or place.zip == addrfeat.zipl:
-                return AddressResult(address.original_address_string,address.number,addrfeat,place)
+                return AddressResult(address.original_address_string, address.number, addrfeat, place)
+
+    def interpolate_address_results(self, address_results):
+
+        for address_result in address_results:
+            addr_feat = address_result.addr_feat
+            points = addr_feat.geom_to_points(addr_feat.geom)
+
+            lfromhn = int(addr_feat.lfromhn) if addr_feat.lfromhn is not None else 0
+            ltohn = int(addr_feat.ltohn) if addr_feat.ltohn is not None else 0
+            rfromhn = int(addr_feat.rfromhn) if addr_feat.rfromhn is not None else 0
+            rtohn = int(addr_feat.rtohn) if addr_feat.rtohn is not None else 0
+
+            print("lfrom: %s, lto: %s, rfrom: %s, rto: %s" %
+                  (addr_feat.lfromhn, addr_feat.ltohn, addr_feat.rfromhn, addr_feat.rtohn))
+
+            interpolated_point = GeoMath.interpolate(points, address_result.primary_number,
+                                                     lfromhn, ltohn, rfromhn, rtohn)
+            address_result.lon = interpolated_point[0]
+            address_result.lat = interpolated_point[1]
 

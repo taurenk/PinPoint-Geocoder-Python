@@ -8,7 +8,8 @@ class GeoMath:
     def __init__(self):
         pass
 
-    def haversine(self, lat1, lon1, lat2, lon2):
+    @staticmethod
+    def haversine(lat1, lon1, lat2, lon2):
         """ Calculate the great circle distance between two points
         on the earth (specified in decimal degrees)
         """
@@ -21,7 +22,8 @@ class GeoMath:
         c = 2 * atan2(sqrt(a), sqrt(1-a))
         return 6371 * c
 
-    def bearing(self, lat1, lon1, lat2, lon2):
+    @staticmethod
+    def bearing(lat1, lon1, lat2, lon2):
         """ Calculate bearing """
         lat1, lat2 = map(radians, [lat1,lat2])
         delta = radians((lon2-lon1))
@@ -31,7 +33,8 @@ class GeoMath:
         bearing = atan2(y, x)
         return (degrees(bearing) + 360) % 360
 
-    def find_point(self, lat, lon, bearing, distance):
+    @staticmethod
+    def find_point(lat, lon, bearing, distance):
         """ create a new point from origin point via
         a distance and bearing
         """
@@ -44,7 +47,10 @@ class GeoMath:
         new_lon = (new_lon+3*pi) % (2*pi) - pi #normalize...
         return [degrees(new_lat), degrees(new_lon)]
 
-    def interpolate(self, points_list, target_number, left_from_house_number, left_to_house_number, right_from_house_number, right_to_house_number):
+    @staticmethod
+    def interpolate(points_list, target_number,
+                    left_from_house_number=0, left_to_house_number=0,
+                    right_from_house_number=0, right_to_house_number=0):
 
         from_number, to_number = left_from_house_number, right_to_house_number
 
@@ -59,7 +65,7 @@ class GeoMath:
         dist_dict = {}
         total_dist = 0
         for idx in range(len(points_list)-1):
-            dist_dict[idx] = self.haversine(points_list[idx][1], points_list[idx][0], points_list[idx+1][1], points_list[idx+1][0])
+            dist_dict[idx] = GeoMath.haversine(points_list[idx][1], points_list[idx][0], points_list[idx+1][1], points_list[idx+1][0])
             total_dist += dist_dict[idx]
 
         target_hn = float(target_number)
@@ -73,7 +79,7 @@ class GeoMath:
             if counted_dist >= target_dist:
                 delta = counted_dist-target_dist
                 segment_distance = dist_dict[k]-delta
-                bearing = self.bearing(points_list[k][0], points_list[k][1], points_list[k+1][0], points_list[k+1][1])
-                interpolated_point = self.find_point(points_list[k][0], points_list[k][1], bearing, segment_distance)
+                bearing = GeoMath.bearing(points_list[k][0], points_list[k][1], points_list[k+1][0], points_list[k+1][1])
+                interpolated_point = GeoMath.find_point(points_list[k][0], points_list[k][1], bearing, segment_distance)
                 break
         return interpolated_point
